@@ -1,0 +1,277 @@
+# Конфигурация команды "/rshop"
+# По факту, это меню
+
+# Слоты в меню:
+# +--------------------------------------------+
+# | 0  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  |
+# | 9  | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 |
+# | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 |
+# | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 |
+# | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 |
+# | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 |
+# +--------------------------------------------+
+
+# Заголовок меню магазина (строка)
+# {page}  - номер страницы с товарами
+# {pages} - количество страниц в магазине
+title: "Магазин за репутацию ({page}/{pages})"
+
+# Размер (количество слотов) меню (положительное число)
+# Должен быть кратен 9 и быть в диапазоне от 9 до 54
+# По умолчанию: 9
+size: 54
+
+# Предметы в меню
+items:
+  - type: _item                                             # Тип элемента
+    slots:                                                  # Список со слотами, где будут находиться элементы этого типа
+      - "10-16"
+      - "19-25"
+
+  - type: _control
+    material: PLAYER_HEAD                                   # Материал элемента
+    # Текстура головы. Только для type=PLAYER_HEAD
+    texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTEyMjc2ZjM3OWNlZjgzYzFiNGFkNWQwYTk4NzAxNDNjN2QyOGIyZDhiNzkzMjRhNTMxOWQ1MTUzMzk3MCJ9fX0=
+    slot: 37                                                # Слот, в котором находится этот элемент
+    displayName: ""                                         # Отображаемое название предмета
+    lore:                                                   # Описание предмета
+      - "  &#f4d172&lВ начало  "
+      - "  &7Возвращает Вас на первую страницу магазина  "
+      - ""
+
+    clickActions:                                           # Действия, выполняемые при клике на этот предмет
+      - "[SOUND] BLOCK_NOTE_BLOCK_PLING"
+      - "[PAGE] 0"
+
+  - type: _control
+    material: PLAYER_HEAD
+    texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzYyNTkwMmIzODllZDZjMTQ3NTc0ZTQyMmRhOGY4ZjM2MWM4ZWI1N2U3NjMxNjc2YTcyNzc3ZTdiMWQifX19
+    slot: 38
+    displayName: ""
+    lore:
+      - "  &#f4d172&lНазад  "
+      - "  &7Возвращает Вас на предыдущую страницу магазина  "
+      - ""
+
+    clickActions:
+      - "[SOUND] BLOCK_NOTE_BLOCK_PLING"
+      - "[PAGE] $prev"
+
+  - type: _unknown
+    material: PLAYER_HEAD
+    texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjRkN2NjNGRjYTk4NmE1M2YxZDZiNTJhYWYzNzZkYzZhY2M3M2I4YjI4N2Y0MmRjOGZlZjU4MDhiYjVkNzYifX19
+    slot: 40
+    displayName: ""
+    lore:
+      - "  &#f4d172&lЧто это и как использовать  "
+      - ""
+      - "  &fМагазин за репутацию - это Ваша возможность получить  "
+      - "  &fдонатные вещи за свою репутацию. Например, Вы можете  "
+      - "  &fкупить здесь питомца или набор коробок с карточками!  "
+      - ""
+      - "  &fУ Вас &#65caef{reputation} &fрепутации  "      # {reputation} - количество репутации у игрока
+      - ""
+
+    clickActions:
+      - "[SOUND] BLOCK_NOTE_BLOCK_PLING"
+
+  - type: _control
+    material: PLAYER_HEAD
+    texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDRiZThhZWVjMTE4NDk2OTdhZGM2ZmQxZjE4OWIxNjY0MmRmZjE5ZjI5NTVjMDVkZWFiYTY4YzlkZmYxYmUifX19
+    slot: 42
+    displayName: ""
+    lore:
+      - "  &#f4d172&lВперёд  "
+      - "  &7Перемещает Вас на следующею страницу  "
+      - ""
+
+    clickActions:
+      - "[SOUND] BLOCK_NOTE_BLOCK_PLING"
+      - "[PAGE] $next"
+
+  - type: _control
+    material: PLAYER_HEAD
+    texture: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWUxN2FhOGU2Y2NlNGIzNjExYWFiODRjNDdmZGFhMTE5OGU2YmU1NWM4NGMzOTNhMmY1ZjU4OWM0MmMyNGIifX19
+    slot: 43
+    displayName: ""
+    lore:
+      - "  &#f4d172&lВ конец  "
+      - "  &7Перемещает Вас на последнюю страницу  "
+      - ""
+
+    clickActions:
+      - "[SOUND] BLOCK_NOTE_BLOCK_PLING"
+      - "[PAGE] $last"
+
+# Настройки отображения товаров и категорий
+#
+# {name}                              - название товара
+# {original} (только в type=template) - оригинальная строка описания товара
+# {price}                             - цена товара
+display:
+  # Отображаемое название товара в меню (строка)
+  displayName: " "
+
+  # Отображаемое описание товара в меню
+  # type - line (просто строка) или template (шаблон для строк описания)
+  # text - текст строки
+  # show - где отображать эту строку, по умолчанию: [product, category]
+  lore:
+    - type: line
+      text: "  &l&#65caef{name}  "
+
+    - type: template
+      text: "  &7{original}  "
+
+    - type: line
+      text: " "
+
+    - type: line
+      text: "  &#65caefЦена: &f{price} репутации  "
+      show: [product]
+
+    - type: line
+      text: "  $if[can_buy]$&fНажмите &#65caefПКМ, &fчтобы купить$else$&cУ вас недостаточно репутации!$endif$  "
+      show: [product]
+
+    - type: line
+      text: "  &fНажмите, чтобы просмотреть товары этой категории  "
+      show: [category]
+
+    - type: line
+      text: " "
+
+# Категории товаров в магазине
+categories:
+  # Питомец
+  - id: pet                                                 # ID этой категории
+    material: PLAYER_HEAD                                   # Материал этой категории в магазине
+    texture: ewogICJ0aW1lc3RhbXAiIDogMTYzMDgwNDc0OTY1NCwKICAicHJvZmlsZUlkIiA6ICIyMDA2NTVkMjMyYTE0MTc2OGIwNjQ0NWNkNTliNDg3NCIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaWVzdHlCbHVlXyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81MGNhOTNlYjYzYzQ3MGM3OGYxMGM3NmYyOTAyYWQ3ODNjNDI2NjUzOWFlNTA5NzIyZmNkOWIyZTIzMDBhOTIiCiAgICB9CiAgfQp9
+    name: "Питомцы"                                         # Название этой категории
+    description:                                            # Описание категории
+      - "Хотите получить какого-нибудь питомца?"
+
+    items:                                                  # Настройки товаров этой категории
+      type: permission                                      # Тип товара
+      data: "mspets.{original.pet}"                         # Данные товара, original - ссылка на объект товара
+      material: PLAYER_HEAD                                 # Материал предмета, который будет отображаться в магазине
+      name: "{original.name} &7(питомец)"                   # Формат названия товара, original - ссылка на объект товара
+      descriptionAppend:                                    # Список строк, который будет добавлен в конец описания товара
+        - "Чтобы вызвать этого питомца, пропишите /pets"
+
+  # Коробки с карточками
+  - id: cards_box
+    material: "[cc]box"
+    name: "Коллекционные карточки"
+    description:
+      - "Вы можете коллекционировать карточки!"
+      - "Их можно получить из коробок, которые"
+      - "даются за разные вещи, или можно просто"
+      - "купить их тут"
+
+    items:
+      type: item
+      data: "[cc]box {original.count}"
+      name: "{original.count} коробк{original.letter1} с карточками"
+      descriptionAppend:
+        - "Вы получите {original.count} короб{original.letter2} с карточками"
+        - "Чтобы открыть коробку, нажмите ПКМ, держа её в руках"
+
+  # Пластинки
+  - id: discs
+    material: MUSIC_DISC_5
+    name: "Пластинки"
+    description:
+      - "У нас есть кастомные пластинки!"
+      - "Вы можете получить набор их этих пластинок,"
+      - "купив из здесь!"
+
+    items:
+      type: item
+      data: "[cd]discs {original.pack.id}"
+      name: "Пластинки серии \"{original.pack.name}\""
+      descriptionAppend:
+        - "Перед покупкой убедитесь, что у вас есть {original.pack.size}"
+        - "свободных слотов в инвентаре"
+
+# Паки пластинок
+packs:
+  # Король и Шут
+  - id: korol_i_shut
+    name: "Король и Шут"
+    discs: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+  # Atomic Heart
+  - id: atomic_heart
+    name: "Atomic Heart"
+    discs: [2, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+
+# Товары в магазине
+goods:
+  # 1. Питомец Among Us
+  - category: pet
+    pet: among_us
+    texture: ewogICJ0aW1lc3RhbXAiIDogMTY4NjEyNDQ4NjAzMywKICAicHJvZmlsZUlkIiA6ICJhYTA3ZjM2Mjk0NTM0YzYwODQzMjI4NzAzZTBlMjE3OCIsCiAgInByb2ZpbGVOYW1lIiA6ICJfU2FrdXlhX0l6YXlvaV8iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDk5YmU5ZDhkNGRiNjNkMWE2MTRhM2Y0MzczMmI0Y2Q5MWQxOWY2MDBlM2E4ZTFjNGU1MWMwYTMxOTY5ODJmOSIKICAgIH0KICB9Cn0=
+    name: "Among Us"
+    price: 19
+    description:
+      - "Он среди нас..."
+
+  # 2. Питомец Brickman
+  - category: pet
+    pet: brickman
+    texture: ewogICJ0aW1lc3RhbXAiIDogMTY4NjEyNzkwODQ1MSwKICAicHJvZmlsZUlkIiA6ICJhZmExOTJmZTFhODY0N2FiOTQ4MzM4ZDY5OTg4ZWNkOCIsCiAgInByb2ZpbGVOYW1lIiA6ICJpX2FtX2Ffc3F1aWRfa2lkIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzUwMDcwMWMwNGMzZmVjYzVmYWRhNWE5YjIzZTcwN2E0YjMwYjgxOGE0ODViYmQ3NjA1NDk4OTZkMzU3ODhlOTMiCiAgICB9CiAgfQp9
+    name: "Брикмен"
+    price: 39
+    description:
+      - "Собрал себя сам"
+
+  # 3. Питомец Выдра
+  - category: pet
+    pet: otter
+    texture: ewogICJ0aW1lc3RhbXAiIDogMTYzMDgwNDc0OTY1NCwKICAicHJvZmlsZUlkIiA6ICIyMDA2NTVkMjMyYTE0MTc2OGIwNjQ0NWNkNTliNDg3NCIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaWVzdHlCbHVlXyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81MGNhOTNlYjYzYzQ3MGM3OGYxMGM3NmYyOTAyYWQ3ODNjNDI2NjUzOWFlNTA5NzIyZmNkOWIyZTIzMDBhOTIiCiAgICB9CiAgfQp9
+    name: "Выдра"
+    price: 29
+    description:
+      - "Какая же милашка!"
+
+  # 4. Питомец Star Platinum
+  - category: pet
+    pet: star_platinum
+    texture: ewogICJ0aW1lc3RhbXAiIDogMTY4NTUzODgyNDAxNSwKICAicHJvZmlsZUlkIiA6ICI4N2YzOGM1MWE4Yzc0MmNmYTY2YTgxNWExZTI2NzMzYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJCZWR3YXJzQ3V0aWUiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODIwYTYyMTg5YWY5MDYwZmNjMDJlNGYxZjRiN2UwNmNkMDA5OGY0ZTQwMDNiYWI0NmFhNmQwZTc4ZDc2YjI3OSIKICAgIH0KICB9Cn0=
+    name: "Star Platinum"
+    price: 79
+    description:
+      - "Олицетворяет оптимизм, проницательность"
+      - "и надежду"
+
+  # 5. 1 коробка с карточками
+  - category: cards_box
+    count: 1
+    letter1: "а"
+    letter2: "у"
+    price: 5
+
+  # 6. 3 коробки с карточками
+  - category: cards_box
+    count: 3
+    letter1: "и"
+    letter2: "и"
+    price: 13
+
+  # 7. 10 коробок с карточками
+  - category: cards_box
+    count: 10
+    letter1: "ок"
+    letter2: "ок"
+    price: 40
+
+  # 8. 10 пластинок серии "Король и Шут"
+  - category: discs
+    pack: korol_i_shut
+    price: 50
+
+  # 9. 11 пластинок серии "Atomic Heart"
+  - category: discs
+    pack: atomic_heart
+    price: 55

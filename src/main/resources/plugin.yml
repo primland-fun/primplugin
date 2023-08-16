@@ -1,0 +1,105 @@
+name: "PrimPlugin"
+description: "Some utils for PrimLand"
+version: "${project.version}"
+authors: [stngularity]
+api-version: 1.19
+main: ru.primland.plugin.PrimPlugin
+
+commands:
+  primplugin:
+    description: "Основная команда плагина PrimPlugin"
+    usage: "{команда} [аргументы...]"
+    aliases: [prim, pp]
+    permission: "primplugin.admin"
+
+  msg:
+    description: "Отправить приватное сообщение любому игроку"
+    usage: "{игрок} {сообщение...}"
+    aliases: [w, pm, dm]
+
+  kick:
+    description: "Кикнуть игрока со сервера"
+    usage: "{игрок} [причина...]"
+    permission: "primplugin.commands.kick"
+
+  help:
+    description: "Справка по механикам и основным командам сервера"
+    usage: ""
+    aliases: [h]
+
+  reputation:
+    description: "Управление репутацией игроков"
+    usage: "{действие} {игрок} [доп.аргументы...]"
+    aliases: [rep, r]
+
+  plwl:
+    description: "Команда для управления белым списком"
+    usage: "{действие} [игрок]"
+
+  #repshop:
+  #  description: "Магазин за репутацию"
+  #  usage: ""
+  #  aliases: [rshop]
+
+permissions:
+  primplugin.*:
+    description: "Все права плагина PrimPlugin"
+    default: op
+    children:
+      primplugin.commands.*: true
+      primplugin.pickupCustomWeapons: true
+
+  primplugin.commands.*:
+    description: "Доступ ко всем командам PrimPlugin (НЕ ДАВАЙТЕ ЭТО ОБЫЧНЫМ ИГРОКАМ)"
+    children:
+      primplugin.commands.primary: true
+      primplugin.commands.modules: true
+      primplugin.commands.reload: true
+      primplugin.commands.info: true
+      primplugin.commands.kick: true
+      primplugin.commands.rep.set: true
+      primplugin.commands.cards.giveBox: true
+      primplugin.commands.cards.get: true
+      primplugin.commands.headDrop.getHead: true
+      primplugin.commands.whitelist.add: true
+      primplugin.commands.whitelist.remove: true
+      primplugin.commands.whitelist.list: true
+
+  primplugin.commands.primary:
+    description: "Доступ к основной (!) команде PrimPlugin"
+
+  primplugin.commands.modules:
+    description: "Позволяет управлять модулями плагина (включать, выключать и перезагружать)"
+
+  primplugin.commands.reload:
+    description: "Доступ к команде /prim reload (Перезагрузить плагин)"
+
+  primplugin.commands.info:
+    description: "Доступ к команде /prim info {модуль} (Информация о модуле плагина)"
+
+  primplugin.commands.kick:
+    description: "Доступ к команде /kick {игрок} [причина] (Кикает указанного игрока)"
+
+  primplugin.commands.rep.set:
+    description: "Доступ к команде /rep set {игрок} {репутация} (Установить репутацию указанному игроку)"
+
+  primplugin.commands.cards.giveBox:
+    description: "Доступ к команде /prim cards give-box {игрок} [количество] (Выдать ящики с карточками)"
+
+  primplugin.commands.cards.get:
+    description: "Доступ к команде /prim cards get {редкость} {ID карточки} (Получить карточку)"
+
+  primplugin.commands.headDrop.getHead:
+    description: "Доступ к команде /prim heads get {игрок} (Получить голову указанного игрока)"
+
+  primplugin.commands.whitelist.add:
+    description: "Доступ к команде /plwl add {игрок} (Добавить игрока в белый список)"
+
+  primplugin.commands.whitelist.remove:
+    description: "Доступ к команде /plwl remove {игрок} (Удалить игрока из белого списка)"
+
+  primplugin.commands.whitelist.list:
+    description: "Доступ к команде /plwl list (Посмотреть список людей в белом списке)"
+
+  primplugin.pickupCustomWeapons:
+    description: "Возможность поднимать кастомные оружия"
