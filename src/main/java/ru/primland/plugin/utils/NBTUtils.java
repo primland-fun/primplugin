@@ -90,7 +90,7 @@ public class NBTUtils {
             profileField.setAccessible(true);
             profileField.set(skull, profile);
         } catch(NoSuchFieldException | IllegalAccessException error) {
-            PrimPlugin.send("&cНе удалось установить текстуру головы через поля");
+            PrimPlugin.send("&cНе удалось установить текстуру головы через поля:");
             error.printStackTrace();
         }
 

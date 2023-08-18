@@ -14,7 +14,7 @@ import ru.primland.plugin.commands.WhitelistCommand;
 import ru.primland.plugin.modules.cards.GiveBoxCommand;
 import ru.primland.plugin.modules.recipes.CustomRecipes;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.utils.database.ChatSettings;
+import ru.primland.plugin.utils.database.data.ChatOptions;
 import ru.primland.plugin.utils.database.MySQLDriver;
 
 import java.time.Instant;
@@ -56,7 +56,7 @@ public class JoinLeaveListener implements Listener {
         if(!driver.playerExists(player.getName()))
             return;
 
-        ChatSettings chat = driver.getChatSettings(player.getName());
+        ChatOptions chat = driver.getChatSettings(player.getName());
         if(chat.getMessages().size() > 0) {
             Config pmConfig = Config.load("commands/private_messages.yml");
             player.sendMessage(Utils.parse(pmConfig.getString("receiver.missedMessages.message"),

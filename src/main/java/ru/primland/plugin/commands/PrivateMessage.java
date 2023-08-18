@@ -13,8 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.utils.database.ChatSettings;
-import ru.primland.plugin.utils.database.Message;
+import ru.primland.plugin.utils.database.data.ChatOptions;
+import ru.primland.plugin.utils.database.data.Message;
 import ru.primland.plugin.utils.database.MySQLDriver;
 
 import java.time.LocalDateTime;
@@ -65,7 +65,7 @@ public class PrivateMessage implements TabExecutor {
         if(!(sender instanceof ConsoleCommandSender))
             Utils.playSound((Player) sender, config.getString("sender.sound", null));
 
-        ChatSettings chat = driver.getChatSettings(args[0]);
+        ChatOptions chat = driver.getChatSettings(args[0]);
         if(receiver != null) {
             receiver.sendMessage(Utils.parse(config.getString("receiver.message"), placeholders));
             String sound = chat.getSound();

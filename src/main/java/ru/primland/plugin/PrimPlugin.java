@@ -24,21 +24,18 @@ import java.util.Collection;
 import java.util.List;
 
 public class PrimPlugin extends JavaPlugin {
-    private static PrimPlugin instance;
-
-    private static boolean enabled;
-
-    private Config config;
-    private Config i18n;
-    private MySQLDriver driver;
-    private PluginPrimaryCommand primaryCommand;
-    private ModuleManager manager;
+    public static PrimPlugin instance;
+    public static Config config;
+    public static Config i18n;
+    public static MySQLDriver driver;
+    public static PluginPrimaryCommand command;
+    public static ModuleManager manager;
+    public static WhitelistCommand whitelistCommand;
 
     private PrivateMessage privateMessageCommand;
     private KickCommand kickCommand;
     private MCHelpCommand helpCommand;
     private ReputationCommand repCommand;
-    private WhitelistCommand whitelistCommand;
 
     private JoinLeaveListener listener;
 
@@ -54,21 +51,21 @@ public class PrimPlugin extends JavaPlugin {
         connectToDatabase();
 
         // Регистрируем команду плагина
-        primaryCommand = new PluginPrimaryCommand();
-        primaryCommand.addCommand(new HelpCommand());
-        primaryCommand.addCommand(new InfoCommand());
-        primaryCommand.addCommand(new ModuleControlCommand());
-        primaryCommand.addCommand(new ReloadCommand());
+        command = new PluginPrimaryCommand();
+        command.addCommand(new HelpCommand());
+        command.addCommand(new InfoCommand());
+        command.addCommand(new ModuleControlCommand());
+        command.addCommand(new ReloadCommand());
 
-        PluginCommand command = getCommand("primplugin");
-        if(command == null) {
+        PluginCommand pluginCommand = getCommand("primplugin");
+        if(pluginCommand == null) {
             send(i18n.getString("registerError"));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        command.setExecutor(primaryCommand);
-        command.setTabCompleter(primaryCommand);
+        pluginCommand.setExecutor(command);
+        pluginCommand.setTabCompleter(command);
 
         // Регистрируем JLl
         listener = new JoinLeaveListener();
@@ -142,9 +139,6 @@ public class PrimPlugin extends JavaPlugin {
         }
 
         mcWlCommand.setExecutor(whitelistCommand);
-
-        // Маркируем как включенный
-        enabled = true;
     }
 
     public void connectToDatabase() {
@@ -163,45 +157,12 @@ public class PrimPlugin extends JavaPlugin {
     public static void send(@NotNull CommandSender sender, String... strings) {
         List<String> stringList = new ArrayList<>(List.of(strings));
 
-        String prefix = "ξ &#65caefPrim&#f4d172Land › &r";
-        Config i18n = PrimPlugin.getInstance().getI18n();
-        if(i18n != null)
-            prefix = i18n.getString("prefix", "ξ &#65caefPrim&#f4d172Land › &r");
+        Config i18n = PrimPlugin.i18n;
+        String prefix = i18n == null ? "ξ &#65caefPrim&#f4d172Land › &r" : i18n
+                .getString("prefix", "ξ &#65caefPrim&#f4d172Land › &r");
 
         stringList.add(0, prefix);
         sender.sendMessage(Utils.translate(String.join("", stringList)));
-    }
-
-    public static boolean isRealEnabled() {
-        return enabled;
-    }
-
-    public static PrimPlugin getInstance() {
-        return instance;
-    }
-
-    public ModuleManager getManager() {
-        return manager;
-    }
-
-    public PluginPrimaryCommand getPrimaryCommand() {
-        return primaryCommand;
-    }
-
-    public Config getPrimaryConfig() {
-        return config;
-    }
-
-    public Config getI18n() {
-        return i18n;
-    }
-
-    public MySQLDriver getDriver() {
-        return driver;
-    }
-
-    public WhitelistCommand getWhitelistCommand() {
-        return whitelistCommand;
     }
 
     public static @NotNull List<String> getOnlinePlayersNames() {

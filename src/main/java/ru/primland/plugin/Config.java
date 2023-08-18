@@ -3,9 +3,12 @@ package ru.primland.plugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -19,35 +22,38 @@ public class Config {
     }
 
     @Contract("_ -> new")
-    public static @NotNull Config load(String filename) {
-        PrimPlugin plugin = PrimPlugin.getInstance();
-        File file = new File(plugin.getDataFolder(), filename);
+    public static @Nullable Config load(String filename) {
+        File file = new File(PrimPlugin.instance.getDataFolder(), filename);
         if(file.exists())
             return new Config(YamlConfiguration.loadConfiguration(file), file);
 
-        PrimPlugin.send("&eКонфигурация " + file.getName() + " не существует, создание...");
+        // TODO: Может удалить? Эта очень бесполезная информация
+        //PrimPlugin.send("&eКонфигурация " + file.getName() + " не существует, создание...");
         if(!file.getParentFile().mkdirs() && !file.getParentFile().isDirectory()) {
             PrimPlugin.send("&cНе удалось создать папку плагина, выключение...");
-            plugin.getPluginLoader().disablePlugin(plugin);
+            PrimPlugin.instance.getPluginLoader().disablePlugin(PrimPlugin.instance);
+            return null;
         }
 
         try {
             if(!file.createNewFile()) {
                 PrimPlugin.send("&cНе удалось создать конфигурацию, выключение...");
-                plugin.getPluginLoader().disablePlugin(plugin);
+                PrimPlugin.instance.getPluginLoader().disablePlugin(PrimPlugin.instance);
+                return null;
             }
 
-            InputStream input = plugin.getResource(filename);
+            InputStream input = PrimPlugin.instance.getResource(filename);
             if(input == null) {
                 PrimPlugin.send("&cНе удалось прочитать дефолтную конфигурацию, выключение...");
-                plugin.getPluginLoader().disablePlugin(plugin);
+                PrimPlugin.instance.getPluginLoader().disablePlugin(PrimPlugin.instance);
+                return null;
             }
 
             input.transferTo(new FileOutputStream(file));
         } catch(IOException error) {
             PrimPlugin.send("&cНе удалось создать конфигурацию, выключение...");
             error.printStackTrace();
-            plugin.getPluginLoader().disablePlugin(plugin);
+            PrimPlugin.instance.getPluginLoader().disablePlugin(PrimPlugin.instance);
         }
 
         return load(filename);

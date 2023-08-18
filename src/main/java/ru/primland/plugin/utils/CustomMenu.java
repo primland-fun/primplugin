@@ -1,5 +1,7 @@
 package ru.primland.plugin.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,7 +12,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
 
@@ -19,12 +20,12 @@ import java.util.function.Consumer;
 
 public class CustomMenu implements Listener {
     private String title;
-    private int size;
+    @Setter private int size;
     private final HashMap<Integer, ItemStack> items;
     private final HashMap<Integer, Consumer<CustomMenu>> itemsCallbacks;
 
-    private Inventory inventory;
-    private Player player;
+    @Getter private Inventory inventory;
+    @Getter private Player player;
 
     public CustomMenu(String title, int size) {
         this.title = Utils.translate(title);
@@ -33,20 +34,8 @@ public class CustomMenu implements Listener {
         this.itemsCallbacks = new HashMap<>();
     }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
-
     public void setTitle(String title) {
         this.title = Utils.translate(title);
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public Inventory getInventory() {
-        return inventory;
     }
 
     public void setItem(int slot, ItemStack item, Consumer<CustomMenu> callback) {
@@ -60,7 +49,7 @@ public class CustomMenu implements Listener {
         items.forEach(inventory::setItem);
         player.openInventory(inventory);
 
-        Bukkit.getPluginManager().registerEvents(this, PrimPlugin.getInstance());
+        Bukkit.getPluginManager().registerEvents(this, PrimPlugin.instance);
     }
 
     public void close(boolean close) {

@@ -20,12 +20,6 @@ import java.util.regex.Pattern;
 public class Utils {
     public static Pattern hexPattern = Pattern.compile("&#([0-9a-f]{6})");
 
-    /**
-     * Рандомизация числа
-     * @param min Минимальное число
-     * @param max Максимальное число
-     * @return Случайное число
-     */
     public static int randomInt(int min, int max) {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
@@ -110,7 +104,7 @@ public class Utils {
     }
 
     public static void dropItem(Player player, ItemStack item) {
-        Bukkit.getScheduler().runTask(PrimPlugin.getInstance(), () ->
+        Bukkit.getScheduler().runTask(PrimPlugin.instance, () ->
                 player.getWorld().dropItemNaturally(player.getLocation(), item));
     }
 }
