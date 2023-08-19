@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.utils.database.data.*;
+import ru.primland.plugin.utils.database.data.subdata.*;
 
 import java.sql.*;
 import java.util.List;

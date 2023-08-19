@@ -26,7 +26,7 @@ public class InfoCommand implements IPluginCommand {
             return;
         }
 
-        ModuleManager manager = PrimPlugin.getInstance().getManager();
+        ModuleManager manager = PrimPlugin.manager;
         IPluginModule module = manager.getModule(args.get(0));
         if(module == null) {
             PrimPlugin.send(sender, "&cИзвините, но вы указали несуществующий модуль");
@@ -50,7 +50,7 @@ public class InfoCommand implements IPluginCommand {
      */
     @Override
     public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String[] args) {
-        Collection<IPluginModule> modules = PrimPlugin.getInstance().getManager().getModules();
+        Collection<IPluginModule> modules = PrimPlugin.manager.getModules();
         List<String> names = new ArrayList<>();
         modules.forEach(module -> {
             String info = module.information();

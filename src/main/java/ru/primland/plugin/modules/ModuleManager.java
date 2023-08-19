@@ -1,6 +1,7 @@
 package ru.primland.plugin.modules;
 
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
+import lombok.Getter;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
@@ -16,9 +17,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class ModuleManager {
+    // TODO: Полная перепись
+    // TODO: [Идея] Может быть отделить менеджер команд?
+
     private final HashMap<String, IPluginModule> modules;
     private final HashMap<String, Config> moduleConfigs;
-    private final HashMap<String, List<IPluginCommand>> moduleSubCommands;
+    @Getter private final HashMap<String, List<IPluginCommand>> moduleSubCommands;
 
     public ModuleManager() {
         this.modules = new HashMap<>();
@@ -49,12 +53,9 @@ public class ModuleManager {
         });
     }
 
-    private void doLog(boolean log, String key, IPluginModule module) {
-        PrimPlugin plugin = PrimPlugin.getInstance();
-        boolean dsmmas = plugin.getI18n().getBoolean("doSendModulesMessagesAtStartup", false);
-
-        if(dsmmas ? log && PrimPlugin.isRealEnabled() : log)
-            PrimPlugin.send(Utils.parse(plugin.getI18n().getString(key), new Placeholder("module", module.getName())));
+    private void doLog(boolean log, String key, @NotNull IPluginModule module) {
+        if(!log) return;
+        PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString(key), new Placeholder("module", module.getName())));
     }
 
     public void disable(@NotNull String moduleName, boolean log) {
@@ -62,7 +63,7 @@ public class ModuleManager {
         if(module == null)
             return;
 
-        module.disable(PrimPlugin.getInstance());
+        module.disable(PrimPlugin.instance);
         doLog(log, "disableModule", module);
 
         Config moduleConfig = moduleConfigs.get(moduleName);
@@ -78,8 +79,7 @@ public class ModuleManager {
         if(module == null)
             return;
 
-        PrimPlugin plugin = PrimPlugin.getInstance();
-        module.enable(plugin);
+        module.enable(PrimPlugin.instance);
         doLog(log, "enableModule", module);
 
         Config moduleConfig = moduleConfigs.get(moduleName);
@@ -95,13 +95,12 @@ public class ModuleManager {
         if(module == null)
             return;
 
-        PrimPlugin plugin = PrimPlugin.getInstance();
-        if(!plugin.getPrimaryCommand().hasCommand(moduleName))
-            plugin.getPrimaryCommand().addCommand(new IPluginCommand() {
+        if(!PrimPlugin.command.hasCommand(moduleName))
+            PrimPlugin.command.addCommand(new IPluginCommand() {
                 @Override
                 public void execute(@NotNull CommandSender sender, List<String> args) {
                     AtomicReference<IPluginCommand> command = new AtomicReference<>(null);
-                    plugin.getManager().getModuleSubCommands(moduleName).forEach(cmd -> {
+                    PrimPlugin.manager.getModuleSubCommands(moduleName).forEach(cmd -> {
                         if(!args.get(0).equals("_primary")) return;
                         command.set(cmd);
                     });
@@ -112,18 +111,18 @@ public class ModuleManager {
                     }
 
                     if(args.get(0) == null) {
-                        PrimPlugin.send(sender, Utils.parse(plugin.getI18n().getString("specifyCommand")));
+                        PrimPlugin.send(sender, Utils.parse(PrimPlugin.i18n.getString("specifyCommand")));
                         return;
                     }
 
                     command.set(null);
-                    plugin.getManager().getModuleSubCommands(moduleName).forEach(cmd -> {
+                    PrimPlugin.manager.getModuleSubCommands(moduleName).forEach(cmd -> {
                         if(!args.get(0).equals(cmd.getName())) return;
                         command.set(cmd);
                     });
 
                     if(command.get() == null) {
-                        PrimPlugin.send(sender, Utils.parse(plugin.getI18n().getString("commandNotFound"),
+                        PrimPlugin.send(sender, Utils.parse(PrimPlugin.i18n.getString("commandNotFound"),
                                 new Placeholder("command", args.get(0))));
 
                         return;
@@ -138,11 +137,11 @@ public class ModuleManager {
                     int argNumber = Math.max(args.length-1, 0);
                     if(argNumber == 1) {
                         List<String> names = new ArrayList<>();
-                        plugin.getManager().getModuleSubCommands(moduleName).forEach(cmd -> names.add(cmd.getName()));
+                        PrimPlugin.manager.getModuleSubCommands(moduleName).forEach(cmd -> names.add(cmd.getName()));
                         return names;
                     }
 
-                    for(IPluginCommand cmd : plugin.getManager().getModuleSubCommands(moduleName)) {
+                    for(IPluginCommand cmd : PrimPlugin.manager.getModuleSubCommands(moduleName)) {
                         if(!List.of(args).get(1).equals(cmd.getName())) continue;
                         return cmd.tabComplete(sender, args);
                     }
@@ -178,7 +177,7 @@ public class ModuleManager {
     }
 
     public void unregisterCommandsFor(String moduleName) {
-        PrimPlugin.getInstance().getPrimaryCommand().removeCommand(moduleName);
+        PrimPlugin.command.removeCommand(moduleName);
         moduleSubCommands.remove(moduleName);
     }
 
@@ -188,10 +187,6 @@ public class ModuleManager {
 
     public Config getModuleConfig(String module) {
         return moduleConfigs.get(module);
-    }
-
-    public HashMap<String, List<IPluginCommand>> getModuleSubCommands() {
-        return moduleSubCommands;
     }
 
     public List<IPluginCommand> getModuleSubCommands(String module) {

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.utils.Utils;
 import ru.primland.plugin.utils.database.MySQLDriver;
+import ru.primland.plugin.utils.database.data.subdata.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

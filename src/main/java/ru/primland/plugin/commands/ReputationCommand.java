@@ -11,7 +11,7 @@ import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.utils.Utils;
 import ru.primland.plugin.utils.database.MySQLDriver;
-import ru.primland.plugin.utils.database.data.Reputation;
+import ru.primland.plugin.utils.database.data.subdata.Reputation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

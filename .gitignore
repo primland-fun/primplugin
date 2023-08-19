@@ -4,3 +4,6 @@
 
 # Output
 target/
+
+# TEMP ZONE
+src/main/java/ru/primland/plugin/utils/database/data/gifts/

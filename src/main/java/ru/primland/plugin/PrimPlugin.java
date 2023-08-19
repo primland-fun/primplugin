@@ -54,7 +54,6 @@ public class PrimPlugin extends JavaPlugin {
         command = new PluginPrimaryCommand();
         command.addCommand(new HelpCommand());
         command.addCommand(new InfoCommand());
-        command.addCommand(new ModuleControlCommand());
         command.addCommand(new ReloadCommand());
 
         PluginCommand pluginCommand = getCommand("primplugin");
