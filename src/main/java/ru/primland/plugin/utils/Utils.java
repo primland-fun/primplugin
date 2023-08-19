@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,5 +108,10 @@ public class Utils {
     public static void dropItem(Player player, ItemStack item) {
         Bukkit.getScheduler().runTask(PrimPlugin.instance, () ->
                 player.getWorld().dropItemNaturally(player.getLocation(), item));
+    }
+
+    @Contract("_ -> new")
+    public static @NotNull LocalDateTime convertTimestampToTime(long timestamp) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
     }
 }

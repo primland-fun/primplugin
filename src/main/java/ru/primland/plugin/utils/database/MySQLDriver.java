@@ -8,14 +8,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.utils.database.data.ChatOptions;
-import ru.primland.plugin.utils.database.data.Message;
-import ru.primland.plugin.utils.database.data.Reputation;
+import ru.primland.plugin.utils.database.data.*;
 
 import java.sql.*;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.TimeZone;
+import java.util.List;
 
 @Getter @RequiredArgsConstructor
 public class MySQLDriver {
@@ -73,6 +69,29 @@ public class MySQLDriver {
             handleConnectionDeath();
         } catch(SQLException error) {
             error.printStackTrace();
+        }
+    }
+
+    /**
+     * Выполнить указанную операцию поиска
+     * @param sql Строка-операция
+     * @return {@link ResultSet}
+     */
+    public ResultSet executeQuery(String sql) {
+        if(!isWorking() || connection == null)
+            return null;
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            return statement.executeQuery();
+        } catch(CommunicationsException error) {
+            // Если всё пошло по жопе и соединение сдохло,
+            // то восстанавливаем его
+            handleConnectionDeath();
+            return null;
+        } catch(SQLException error) {
+            error.printStackTrace();
+            return null;
         }
     }
 
@@ -213,7 +232,7 @@ public class MySQLDriver {
         buffer.append(" LIMIT 1)");
 
         boolean exists = false;
-        ResultSet result = connection.prepareStatement(buffer.toString()).executeQuery();
+        ResultSet result = executeQuery(buffer.toString());
         while(result.next())
             exists = result.getInt(1) == 1;
 
@@ -236,107 +255,9 @@ public class MySQLDriver {
     }
 
     public void addPlayer(@NotNull Player player) {
-        if(!isWorking() || connection == null)
-            return;
-
         Config reputationConfig = Config.load("reputation.yml");
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("INSERT INTO ").append(prefix).append("players VALUES (");
-
-        // Ник игрока
-        buffer.append("'").append(player.getName()).append("', ");
-
-        // Подарки, полученные игроком
-        buffer.append("'[]', ");
-
-        // Параметры чата игрока
-        buffer.append("'{\"doPlaySound\": true, \"sound\": null, \"messages\": [], " +
-                "\"lastReceived\": null, \"flags\": 0}', ");
-
-        // Параметры администрирования
-        buffer.append("'{\"spy\": 0}', ");
-
-        // Карточки игрока
-        buffer.append("'[]', ");
-
-        // Валюты, имеющиеся у игрока
-        buffer.append("'{\"reputation\": 0, \"donate\": 0}', ");
-
-        // Репутация игрока
-        buffer.append("'{\"value\": ").append(reputationConfig.getInteger("defaultReputation", 0));
-        buffer.append(", \"lastGiveOrTake\": -1}')");
-
-        try {
-            connection.prepareStatement(buffer.toString()).execute();
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-        } catch(SQLException error) {
-            error.printStackTrace();
-        }
-    }
-
-    public void updateReputation(@NotNull String player, int count) {
-        if(!isWorking() || connection == null)
-            return;
-
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("UPDATE ").append(prefix).append("players SET reputation=JSON_SET(reputation, '$.value', ");
-        buffer.append(count);
-        buffer.append(") WHERE name='").append(player).append("'");
-
-        try {
-            connection.prepareStatement(buffer.toString()).executeUpdate();
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-        } catch(SQLException error) {
-            error.printStackTrace();
-        }
-    }
-
-    public void updateLastGiveOrTake(@NotNull String player) {
-        if(!isWorking() || connection == null)
-            return;
-
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("UPDATE ").append(prefix).append("players SET reputation=JSON_SET(reputation, '$.lastGiveOrTake', ");
-        buffer.append(Timestamp.valueOf(LocalDateTime.now()).getTime());
-        buffer.append(") WHERE name='").append(player).append("'");
-
-        try {
-            connection.prepareStatement(buffer.toString()).executeUpdate();
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-        } catch(SQLException error) {
-            error.printStackTrace();
-        }
-    }
-
-    public boolean canNotGiveOrTake(String player) {
-        if(!isWorking() || connection == null)
-            return true;
-
-        ResultSet dbPlayer = getPlayer(player);
-        try {
-            String json = "";
-            while(dbPlayer.next())
-                json = dbPlayer.getString("reputation");
-
-            long lastGiveOrTake = Reputation.fromJSON(json).getLastGiveOrTake();
-            if(lastGiveOrTake == -1)
-                return false;
-
-            LocalDateTime nextOpportunity = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastGiveOrTake),
-                    TimeZone.getDefault().toZoneId()).plusDays(3);
-
-            LocalDateTime now = LocalDateTime.now();
-            return !now.isAfter(nextOpportunity) && !now.isEqual(nextOpportunity);
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-            return true;
-        } catch(SQLException error) {
-            error.printStackTrace();
-            return true;
-        }
+        execute("INSERT INTO %splayers VALUES ('%s', 0, NULL, NULL, 0, 0, '[]', 0, 0, %d, -1)".formatted(
+                prefix, player.getName(), reputationConfig.getInteger("defaultReputation", 0)));
     }
 
     public ResultSet getTopByReputation(int limit) {
@@ -355,90 +276,31 @@ public class MySQLDriver {
         }
     }
 
-    public void addMessage(String player, Message message) {
-        if(isNotWorking() || connection == null)
-            return;
-
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("UPDATE ").append(prefix).append("players SET chat_settings=JSON_ARRAY_APPEND(chat_settings, '$.messages', ");
-        buffer.append(message.toJSON());
-        buffer.append(") WHERE name='").append(player).append("'");
-
+    public PrimPlayer getPlayer(@NotNull String name) {
         try {
-            connection.prepareStatement(buffer.toString()).executeUpdate();
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-        } catch(SQLException error) {
-            error.printStackTrace();
-        }
-    }
+            ResultSet result = executeQuery("SELECT * FROM %splayers WHERE name='%s'".formatted(prefix, name));
+            if(!result.next())
+                return null;
 
-    public ChatOptions getChatSettings(String player) {
-        if(isNotWorking() || connection == null)
-            return null;
-
-        ResultSet dbPlayer = getPlayer(player);
-        try {
-            String json = "";
-            while(dbPlayer.next())
-                json = dbPlayer.getString("chat_settings");
-
-            return (new Gson()).fromJson(json, ChatOptions.class);
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-            return null;
-        } catch(SQLException error) {
-            error.printStackTrace();
-            return null;
-        }
-    }
-
-    public int getReputation(String player) {
-        Config reputationConfig = Config.load("reputation.yml");
-        if(isNotWorking() || connection == null)
-            return reputationConfig.getInteger("defaultReputation", 0);
-
-        ResultSet dbPlayer = getPlayer(player);
-        try {
-            String json = "";
-            while(dbPlayer.next())
-                json = dbPlayer.getString("reputation");
-
-            return Reputation.fromJSON(json).getValue();
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-            return reputationConfig.getInteger("defaultReputation", 0);
-        } catch(SQLException error) {
-            error.printStackTrace();
-            return reputationConfig.getInteger("defaultReputation", 0);
-        }
-    }
-
-    public void clearMessages(String player) {
-        if(isNotWorking() || connection == null)
-            return;
-
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("UPDATE ").append(prefix).append("players SET chat_settings=JSON_SET(chat_settings, ");
-        buffer.append("'$.messages', []");
-        buffer.append(") WHERE name='").append(player).append("'");
-
-        try {
-            connection.prepareStatement(buffer.toString()).executeUpdate();
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-        } catch(SQLException error) {
-            error.printStackTrace();
-        }
-    }
-
-    public ResultSet getPlayer(@NotNull String player) {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("SELECT * FROM ").append(prefix).append("players ");
-        buffer.append("WHERE name='").append(player).append("'");
-
-        try {
-            return connection.prepareStatement(buffer.toString()).executeQuery();
+            return new PrimPlayer(
+                    this, name,
+                    result.getInt("daily_strike"),
+                    new ChatOptions(
+                            result.getString("chat.sound"),
+                            result.getString("chat.lastReceived"),
+                            ChatOptions.toFlags(result.getInt("chat.flags"))
+                    ),
+                    new AdminOptions(AdminOptions.toSpyFlags(result.getInt("admin.spy"))),
+                    Card.toCardList((new Gson()).fromJson(result.getString("cards"), List.class)),
+                    new Balance(
+                            result.getInt("balance.reputation"),
+                            result.getInt("balance.donate")
+                    ),
+                    new Reputation(
+                            result.getInt("reputation.value"),
+                            result.getLong("reputation.lastAction")
+                    )
+            );
         } catch(CommunicationsException error) {
             handleConnectionDeath();
             return null;
@@ -449,7 +311,7 @@ public class MySQLDriver {
     }
 
     public void disconnect() {
-        if(isNotWorking() || connection == null)
+        if(!isWorking() || connection == null)
             return;
 
         working = false;

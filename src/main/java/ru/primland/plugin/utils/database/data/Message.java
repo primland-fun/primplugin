@@ -25,13 +25,4 @@ public class Message {
 
     // Время отправки сообщения
     private @NotNull LocalDateTime time;
-
-    /**
-     * Пометить сообщение как прочитанное
-     * (удалить его из базы данных)
-     */
-    public void markAsRead() {
-        driver.execute("DELETE FROM %smessages WHERE sender='%s' AND receiver='%s' AND content='%s' AND time=%d"
-                .formatted(driver.getPrefix(), sender, receiver, content, Timestamp.valueOf(time).getTime()));
-    }
 }
