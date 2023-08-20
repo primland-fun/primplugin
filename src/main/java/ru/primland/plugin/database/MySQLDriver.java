@@ -350,6 +350,9 @@ public class MySQLDriver {
         return output;
     }
 
+    /**
+     * Отключиться от базы данных
+     */
     public void disconnect() {
         if(!isWorking() || connection == null)
             return;
