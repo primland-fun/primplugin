@@ -66,9 +66,9 @@ public class Utils {
         return new ArrayList<>();
     }
 
-    public static @NotNull Map<String, ?> convertObjectToMap(@NotNull Object object) {
+    public static @NotNull <T> Map<String, T> convertObjectToMap(@NotNull Object object, Class<T> valueType) {
         if(object instanceof Map)
-            return new HashMap<>((Map<String, ?>) object);
+            return new HashMap<>((Map<String, T>) object);
 
         return new HashMap<>();
     }

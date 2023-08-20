@@ -1,12 +1,19 @@
 package ru.primland.plugin;
 
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.commands.*;
-import ru.primland.plugin.commands.plugin.*;
+import ru.primland.plugin.commands.plugin.HelpCommand;
+import ru.primland.plugin.commands.plugin.InfoCommand;
+import ru.primland.plugin.commands.plugin.PluginPrimaryCommand;
+import ru.primland.plugin.commands.plugin.ReloadCommand;
+import ru.primland.plugin.database.MySQLDriver;
 import ru.primland.plugin.modules.IPluginModule;
 import ru.primland.plugin.modules.ModuleManager;
 import ru.primland.plugin.modules.a2border.Achievements2Border;
@@ -17,7 +24,6 @@ import ru.primland.plugin.modules.owner_check.CustomItem;
 import ru.primland.plugin.modules.recipes.CustomRecipes;
 import ru.primland.plugin.modules.recipes.GlowEnchantment;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.utils.database.MySQLDriver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +37,7 @@ public class PrimPlugin extends JavaPlugin {
     public static PluginPrimaryCommand command;
     public static ModuleManager manager;
     public static WhitelistCommand whitelistCommand;
+    public static LuckPerms lpApi;
 
     private PrivateMessage privateMessageCommand;
     private KickCommand kickCommand;
@@ -49,6 +56,9 @@ public class PrimPlugin extends JavaPlugin {
 
         // Пытаемся подключиться к базе данных
         connectToDatabase();
+
+        // Пытаемся получить доступ к API LuckPerms
+        lpApi = getLuckPermsApi();
 
         // Регистрируем команду плагина
         command = new PluginPrimaryCommand();
@@ -147,6 +157,16 @@ public class PrimPlugin extends JavaPlugin {
                 config.getString("database.connection.database", "minecraft"),
                 config.getString("database.authorization.username", null),
                 config.getString("database.authorization.password", null));
+    }
+
+    private @Nullable LuckPerms getLuckPermsApi() {
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if(provider == null) {
+            send("&eНе удалось получить доступ к LuckPerms. Он не установлен?");
+            return null;
+        }
+
+        return provider.getProvider();
     }
 
     public static void send(String... strings) {

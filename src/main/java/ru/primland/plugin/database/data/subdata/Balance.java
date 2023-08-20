@@ -1,4 +1,4 @@
-package ru.primland.plugin.utils.database.data.subdata;
+package ru.primland.plugin.database.data.subdata;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

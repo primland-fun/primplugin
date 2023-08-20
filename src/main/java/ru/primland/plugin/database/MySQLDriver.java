@@ -1,4 +1,4 @@
-package ru.primland.plugin.utils.database;
+package ru.primland.plugin.database;
 
 import com.google.gson.Gson;
 import com.mysql.cj.jdbc.exceptions.CommunicationsException;
@@ -8,10 +8,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.utils.database.data.*;
-import ru.primland.plugin.utils.database.data.subdata.*;
+import ru.primland.plugin.database.data.PrimPlayer;
+import ru.primland.plugin.database.data.gifts.GiftContent;
+import ru.primland.plugin.database.data.gifts.GiftType;
+import ru.primland.plugin.database.data.gifts.GlobalGift;
+import ru.primland.plugin.database.data.subdata.*;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter @RequiredArgsConstructor
@@ -167,8 +171,7 @@ public class MySQLDriver {
                 "sender VARCHAR(16) NOT NULL",
                 "receiver VARCHAR(16) NOT NULL",
                 "content TEXT",
-                "time BIGINT",
-                "PRIMARY KEY (receiver)");
+                "time BIGINT");
 
         // Таблица подарков
         // ----------------------------------------------------------------------
@@ -186,9 +189,8 @@ public class MySQLDriver {
                 "id VARCHAR(32) NOT NULL",
                 "name VARCHAR(64)",
                 "type TINYINT NOT NULL",
-                "content JSON NOT NULL",
-                "receiver VARCHAR(16)",
-                "PRIMARY KEY (id)");
+                "content JSON",
+                "receiver VARCHAR(16)");
 
         // Таблица логов (+ телеметрии)
         // -----------------------------------------
@@ -240,6 +242,12 @@ public class MySQLDriver {
         return exists;
     }
 
+    /**
+     * Проверить, существует ли игрок в базе данных
+     *
+     * @param player Ник игрока
+     * @return true, если существует, иначе false
+     */
     public boolean playerExists(@NotNull String player) {
         if(!isWorking() || connection == null)
             return true;
@@ -255,28 +263,34 @@ public class MySQLDriver {
         }
     }
 
+    /**
+     * Добавить игрока в базу данных
+     *
+     * @param player Объект Bukkit игрока
+     */
     public void addPlayer(@NotNull Player player) {
         Config reputationConfig = Config.load("reputation.yml");
         execute("INSERT INTO %splayers VALUES ('%s', 0, NULL, NULL, 0, 0, '[]', 0, 0, %d, -1)".formatted(
                 prefix, player.getName(), reputationConfig.getInteger("defaultReputation", 0)));
     }
 
+    /**
+     * Получить топ игроков по репутации
+     *
+     * @param limit Количество людей в топе
+     * @return {@link ResultSet}
+     */
     public ResultSet getTopByReputation(int limit) {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append("SELECT * FROM ").append(prefix).append("players ");
-        buffer.append("ORDER BY JSON_EXTRACT(reputation, '$.value') DESC LIMIT ").append(limit);
-
-        try {
-            return connection.prepareStatement(buffer.toString()).executeQuery();
-        } catch(CommunicationsException error) {
-            handleConnectionDeath();
-            return null;
-        } catch(SQLException error) {
-            error.printStackTrace();
-            return null;
-        }
+        return executeQuery("SELECT * FROM %splayers ORDER BY `reputation.value` DESC LIMIT %d".formatted(prefix,
+                limit));
     }
 
+    /**
+     * Получить объект чопорного (^_^) игрока
+     *
+     * @param name Ник игрока
+     * @return {@link PrimPlayer}
+     */
     public PrimPlayer getPlayer(@NotNull String name) {
         try {
             ResultSet result = executeQuery("SELECT * FROM %splayers WHERE name='%s'".formatted(prefix, name));
@@ -309,6 +323,31 @@ public class MySQLDriver {
             error.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Получить список глобальных подарков
+     * @return Список с подарками
+     */
+    public List<GlobalGift> getGlobalGift() {
+        List<GlobalGift> output = new ArrayList<>();
+        try {
+            ResultSet result = executeQuery("SELECT * FROM %sgifts WHERE type=%d".formatted(prefix,
+                    GiftType.GLOBAL.getValue()));
+
+            while(result.next()) {
+                output.add(new GlobalGift(
+                        this,
+                        result.getString("id"),
+                        result.getString("name"),
+                        GiftContent.deserialize(result.getString("content"))
+                ));
+            }
+        } catch(SQLException error) {
+            error.printStackTrace();
+        }
+
+        return output;
     }
 
     public void disconnect() {

@@ -1,12 +1,11 @@
-package ru.primland.plugin.utils.database.data;
+package ru.primland.plugin.database.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import ru.primland.plugin.utils.database.MySQLDriver;
+import ru.primland.plugin.database.MySQLDriver;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Getter @Setter @AllArgsConstructor

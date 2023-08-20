@@ -1,4 +1,4 @@
-package ru.primland.plugin.utils.database.data;
+package ru.primland.plugin.database.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,9 +6,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.primland.plugin.database.data.gifts.GiftContent;
+import ru.primland.plugin.database.data.gifts.LocalGift;
+import ru.primland.plugin.database.data.subdata.*;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.utils.database.MySQLDriver;
-import ru.primland.plugin.utils.database.data.subdata.*;
+import ru.primland.plugin.database.MySQLDriver;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -254,5 +256,33 @@ public class PrimPlayer {
      */
     public void markAllMessagesAsRead() {
         driver.execute("DELETE FROM %smessages WHERE receiver='%s'".formatted(driver.getPrefix(), name));
+    }
+
+    /**
+     * Найти неполученные подарки, адресованные этому игроку
+     * @return Список с подарками
+     */
+    public List<LocalGift> searchGifts() {
+        List<LocalGift> output = new ArrayList<>();
+        ResultSet result = driver.executeQuery("SELECT * FROM %sgifts WHERE receiver='%s'".formatted(
+                driver.getPrefix(), name));
+
+        if(result == null)
+            return output;
+
+        try {
+            while(result.next()) {
+                output.add(new LocalGift(
+                        driver,
+                        result.getString("id"),
+                        result.getString("name"),
+                        GiftContent.deserialize(result.getString("content"))
+                ));
+            }
+        } catch(SQLException error) {
+            error.printStackTrace();
+        }
+
+        return output;
     }
 }

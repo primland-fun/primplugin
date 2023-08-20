@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.utils.database.data.subdata.ChatOptions;
-import ru.primland.plugin.utils.database.data.Message;
-import ru.primland.plugin.utils.database.MySQLDriver;
+import ru.primland.plugin.database.data.subdata.ChatOptions;
+import ru.primland.plugin.database.data.Message;
+import ru.primland.plugin.database.MySQLDriver;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

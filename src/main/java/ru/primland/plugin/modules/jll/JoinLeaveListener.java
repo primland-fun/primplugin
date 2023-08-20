@@ -14,8 +14,8 @@ import ru.primland.plugin.commands.WhitelistCommand;
 import ru.primland.plugin.modules.cards.GiveBoxCommand;
 import ru.primland.plugin.modules.recipes.CustomRecipes;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.utils.database.data.subdata.ChatOptions;
-import ru.primland.plugin.utils.database.MySQLDriver;
+import ru.primland.plugin.database.data.subdata.ChatOptions;
+import ru.primland.plugin.database.MySQLDriver;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

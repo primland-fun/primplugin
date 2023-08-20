@@ -17,17 +17,15 @@ CREATE TABLE IF NOT EXISTS messages (
     sender VARCHAR(16) NOT NULL,
     receiver VARCHAR(16) NOT NULL,
     content TEXT,
-    time BIGINT,
-    PRIMARY KEY (receiver)
+    time BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS gifts (
     id VARCHAR(32) NOT NULL,
     name VARCHAR(64),
     type TINYINT NOT NULL,
-    content JSON NOT NULL,
-    receiver VARCHAR(16),
-    PRIMARY KEY (id)
+    content JSON,
+    receiver VARCHAR(16)
 );
 
 CREATE TABLE IF NOT EXISTS logs (

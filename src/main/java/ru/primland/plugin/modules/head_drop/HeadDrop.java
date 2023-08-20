@@ -17,7 +17,7 @@ import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.modules.IPluginModule;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.utils.database.MySQLDriver;
+import ru.primland.plugin.database.MySQLDriver;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
