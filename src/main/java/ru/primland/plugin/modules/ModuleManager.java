@@ -18,7 +18,6 @@ import java.util.function.Function;
 
 public class ModuleManager {
     // TODO: Полная перепись
-    // TODO: [Идея] Может быть отделить менеджер команд?
 
     private final HashMap<String, IPluginModule> modules;
     private final HashMap<String, Config> moduleConfigs;

@@ -12,15 +12,10 @@ commands:
     aliases: [prim, pp]
     permission: "primplugin.admin"
 
-  msg:
-    description: "Отправить приватное сообщение любому игроку"
-    usage: "{игрок} {сообщение...}"
-    aliases: [w, pm, dm]
-
-  kick:
-    description: "Кикнуть игрока со сервера"
-    usage: "{игрок} [причина...]"
-    permission: "primplugin.commands.kick"
+  #msg:
+  #  description: "Отправить приватное сообщение любому игроку"
+  #  usage: "{игрок} {сообщение...}"
+  #  aliases: [w, pm, dm]
 
   help:
     description: "Справка по механикам и основным командам сервера"
@@ -32,9 +27,9 @@ commands:
     usage: "{действие} {игрок} [доп.аргументы...]"
     aliases: [rep, r]
 
-  plwl:
-    description: "Команда для управления белым списком"
-    usage: "{действие} [игрок]"
+  #plwl:
+  #  description: "Команда для управления белым списком"
+  #  usage: "{действие} [игрок]"
 
   #repshop:
   #  description: "Магазин за репутацию"
@@ -56,7 +51,6 @@ permissions:
       primplugin.commands.modules: true
       primplugin.commands.reload: true
       primplugin.commands.info: true
-      primplugin.commands.kick: true
       primplugin.commands.rep.set: true
       primplugin.commands.cards.giveBox: true
       primplugin.commands.cards.get: true
@@ -76,9 +70,6 @@ permissions:
 
   primplugin.commands.info:
     description: "Доступ к команде /prim info {модуль} (Информация о модуле плагина)"
-
-  primplugin.commands.kick:
-    description: "Доступ к команде /kick {игрок} [причина] (Кикает указанного игрока)"
 
   primplugin.commands.rep.set:
     description: "Доступ к команде /rep set {игрок} {репутация} (Установить репутацию указанному игроку)"

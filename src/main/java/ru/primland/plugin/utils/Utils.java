@@ -16,6 +16,7 @@ import ru.primland.plugin.PrimPlugin;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,5 +114,15 @@ public class Utils {
     @Contract("_ -> new")
     public static @NotNull LocalDateTime convertTimestampToTime(long timestamp) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
+    }
+
+    public static <K, V> @NotNull Map<K, V> search(@NotNull Map<K, V> original, Function<V, Boolean> filter) {
+        Map<K, V> output = new HashMap<>();
+        original.forEach((key, value) -> {
+            if(!filter.apply(value)) return;
+            output.put(key, value);
+        });
+
+        return output;
     }
 }

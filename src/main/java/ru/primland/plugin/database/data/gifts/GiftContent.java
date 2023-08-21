@@ -172,6 +172,6 @@ public class GiftContent {
 
         // Удаляем последнюю запятую и добавляем "]", после чего преобразовываем в
         // строку
-        return output.deleteCharAt(output.length()-2).append(']').toString();
+        return output.deleteCharAt(output.length()-1).append(']').toString();
     }
 }

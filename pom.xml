@@ -99,13 +99,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Mojang Brigadier library -->
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>brigadier</artifactId>
-            <version>1.0.18</version>
-        </dependency>
-
         <!-- Lombok API -->
         <dependency>
             <groupId>net.luckperms</groupId>

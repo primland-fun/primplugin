@@ -1,83 +1,159 @@
 package ru.primland.plugin.commands.manager;
 
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.tree.LiteralCommandNode;
-import net.minecraft.commands.CommandSourceStack;
-import org.jetbrains.annotations.Contract;
+import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
+import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.annotations.Command;
+import ru.primland.plugin.commands.manager.annotations.Argument;
+import ru.primland.plugin.commands.manager.annotations.CommandInfo;
+import ru.primland.plugin.utils.Utils;
 
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.net.URL;
-import java.util.ArrayList;
+import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
+/**
+ * Менеджер команд
+ */
 public class CommandManager {
-    private static final String packageName = "ru.primland.plugin";
+    private static Map<String, CachedCommand> cache;
+    private static CommandMap commandMap;
 
-    private static final CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
-    private static final Map<String, LiteralCommandNode<CommandSourceStack>> cache = new HashMap<>();
+    /**
+     * Инициализировать менеджер.
+     * Данная функция создаёт кеш и получает доступ к карте команд
+     */
+    public static void init() {
+        cache = new HashMap<>();
+        commandMap = getCommandMap();
 
-    public static void registerCommands() {
-        try {
-            List<Class<?>> classes = getAllAnnotatedClasses();
-            classes.forEach(clazz -> {
-                Command annotation = getAnnotation(clazz, Command.class);
-                assert annotation != null;
-
-
-            });
-        } catch(ClassNotFoundException error) {
-            PrimPlugin.send("&cНе удалось найти класс, выключение...");
-            error.printStackTrace();
+        if(commandMap == null) {
+            PrimPlugin.send(PrimPlugin.i18n.getString("commandMapFailed"));
             PrimPlugin.instance.getServer().getPluginManager().disablePlugin(PrimPlugin.instance);
         }
     }
 
-    private static @Nullable <T> T getAnnotation(@NotNull Class<?> clazz, Class<T> annotationClass) {
-        for(Annotation annotation : clazz.getAnnotations()) {
-            if(!annotation.annotationType().equals(annotationClass))
-                continue;
-
-            return (T) annotation;
-        }
-
-        return null;
+    /**
+     * Зарегистрировать все команды из этого проекта (просто ищет все реализации
+     * ICommand и вызывает функции регистрации для каждой)
+     */
+    public static void registerAll() {
+        ServiceLoader<ICommand> loader = ServiceLoader.load(ICommand.class);
+        loader.forEach(CommandManager::register);
+        checkSubCommands();
     }
 
-    @Contract(" -> new")
-    private static @NotNull List<Class<?>> getAllAnnotatedClasses() throws ClassNotFoundException {
-        ClassLoader loader = PrimPlugin.class.getClassLoader();
-        URL urls = loader.getResource(packageName.replace(".", "/"));
-        if(urls == null)
-            return new ArrayList<>();
+    /**
+     * Проверяет все подкоманды на то, чтобы у них всех был указан существующий
+     * родительский элемент.<br>
+     * <br>
+     * Если же это не так, но пишет об этом в консоль и снимает регистрацию с команды
+     */
+    public static void checkSubCommands() {
+        cache.forEach((key, value) -> {
+            if(value.getInfo().parent().isEmpty())
+                return;
 
-        File folder = new File(urls.getPath());
-        File[] classes = folder.listFiles();
-        if(classes == null)
-            return new ArrayList<>();
+            if(cache.containsKey(value.getInfo().parent()))
+                return;
 
-        List<Class<?>> output = new ArrayList<>();
-        for(File clazz : classes) {
-            int index = clazz.getName().indexOf(".");
-            String className = clazz.getName().substring(0, index);
-            String classNamePath = packageName + "." + className;
-            Class<?> repoClass = Class.forName(classNamePath);
+            unregister(key);
+        });
+    }
 
-            Annotation[] annotations = repoClass.getAnnotations();
-            for(Annotation annotation : annotations) {
-                if(annotation.annotationType() != Command.class)
-                    continue;
+    /**
+     * Зарегистрировать указанную команду
+     *
+     * @param command Объект реализации команды
+     */
+    public static void register(@NotNull ICommand command) {
+        // Получаем и проверяем информацию о команде
+        CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
+        if(info == null) {
+            PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("commandInfoNotFound"),
+                    new Placeholder("class", command.getClass().getName())));
 
-                output.add(repoClass);
-            }
+            PrimPlugin.instance.getServer().getPluginManager().disablePlugin(PrimPlugin.instance);
+            return;
         }
 
-        return output;
+        // Создаём экземпляр BukkitCommand, регистрируем его как команду и добавляем
+        // в кеш
+        BukkitCommand bukkitCommand = new BukkitCommand(command, info);
+        commandMap.register(info.name(), bukkitCommand);
+        cache.put(info.name(), new CachedCommand(command, info, bukkitCommand));
+    }
+
+    /**
+     * Снять регистрацию со всех команд
+     */
+    public static void unregisterAll() {
+        cache.keySet().forEach(CommandManager::unregister);
+    }
+
+    /**
+     * Снять регистрацию с указанной команды
+     *
+     * @param commandName Название команды
+     */
+    public static void unregister(@NotNull String commandName) {
+        CachedCommand command = cache.get(commandName);
+        if(command == null)
+            return;
+
+        command.getBukkitCommand().unregister(commandMap);
+        command.getCommand().unload(PrimPlugin.instance);
+        cache.remove(commandName);
+    }
+
+    /**
+     * Найти все подкоманды указанной родительской команды
+     *
+     * @param parent Название родительской команды
+     * @return Карта, где ключ - это название команды, а значение - это кеш-объект
+     *         команды
+     */
+    public static @NotNull Map<String, CachedCommand> searchSubCommands(@NotNull String parent) {
+        return Utils.search(cache, (command) -> command.getInfo().parent().equals(parent));
+    }
+
+    /**
+     * Получить доступ к карте команд
+     * @return {@link CommandMap}
+     */
+    private static @Nullable CommandMap getCommandMap() {
+        if(!(Bukkit.getPluginManager() instanceof SimplePluginManager))
+            return null;
+
+        try {
+            Field field = SimplePluginManager.class.getDeclaredField("commandMap");
+            field.setAccessible(true);
+            return (CommandMap) field.get(Bukkit.getPluginManager());
+        } catch(NoSuchFieldException | IllegalAccessException error) {
+            return null;
+        }
+    }
+
+    /**
+     * Сформировать строку использования для команды
+     *
+     * @param info Информация о команде
+     * @return Сформированная строка использования
+     */
+    public static @NotNull String getUsage(@NotNull CommandInfo info) {
+        StringBuilder builder = new StringBuilder();
+        for(Argument argument : info.arguments()) {
+            builder.append(argument.required() ? "{" : "[");
+            builder.append(argument.displayName().isEmpty() ? argument.name() : argument.displayName());
+            builder.append(argument.required() ? "}" : "]");
+            builder.append(" ");
+        }
+
+        return (builder.charAt(builder.length()-1) == ' ' ? builder.deleteCharAt(
+                builder.length()-1) : builder).toString();
     }
 }

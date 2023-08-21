@@ -3,92 +3,117 @@ package ru.primland.plugin.commands;
 import io.github.stngularity.epsilon.engine.placeholders.IPlaceholder;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.commands.manager.Arguments;
+import ru.primland.plugin.commands.manager.ICommand;
+import ru.primland.plugin.commands.manager.annotations.Argument;
+import ru.primland.plugin.commands.manager.annotations.ArgumentSuggestion;
+import ru.primland.plugin.commands.manager.annotations.CommandInfo;
+import ru.primland.plugin.database.data.PrimPlayer;
 import ru.primland.plugin.utils.Utils;
-import ru.primland.plugin.database.data.subdata.ChatOptions;
-import ru.primland.plugin.database.data.Message;
-import ru.primland.plugin.database.MySQLDriver;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-public class PrivateMessage implements TabExecutor {
-    private Config config;
+@CommandInfo(
+        name="msg",
+        description="Отправить приватное сообщение любому другому игроку",
+        aliases={"w", "pm", "dm"},
+        arguments={
+                // При указании Player как тип getValue() будет возвращать строку
+                @Argument(name="receiver", type=Player.class, displayName="игрок", required=true),
+                @Argument(name="message", type=String.class, displayName="сообщение", required=true,
+                        dynamicSuggestion=ArgumentSuggestion.ONLINE_PLAYERS)
+        }
+)
+public class PrivateMessage implements ICommand {
+    // TODO: слежка (логи приватных сообщений)
 
-    public PrivateMessage(Config config) {
-        this.config = config;
+    /**
+     * Объект конфигурации приватных сообщений
+     */
+    public static Config config;
+
+    /**
+     * Загрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
+    public void load(PrimPlugin plugin) {
+        config = Config.load("commands/private_messages.yml");
     }
 
+    /**
+     * Отгрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
+    public void unload(PrimPlugin plugin) {
+        config = null;
+    }
+
+    /**
+     * Выполнить команду с указанными данными
+     *
+     * @param sender Отправитель команды
+     * @param args   Аргументы команды
+     * @return Сообщение для отправителя команды
+     */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String @NotNull [] args) {
-        Config i18n = PrimPlugin.getInstance().getI18n();
+    public @Nullable String execute(@NotNull CommandSender sender, @NotNull Arguments args) {
         List<IPlaceholder> placeholders = new ArrayList<>();
         placeholders.add(new Placeholder("sender", sender.getName()));
 
-        if(args.length == 0) {
-            PrimPlugin.send(sender, Utils.parse(i18n.getString("specifyPlayerNotSelf"), placeholders));
-            return true;
-        }
+        // Получаем ник получателя (нам не нужно проверять всё это, т.к. это делается
+        // автоматически)
+        String player = (String) Objects.requireNonNull(args.getArgument("receiver")).getValue();
 
-        placeholders.add(new Placeholder("receiver", args[0]));
-        Player receiver = Bukkit.getPlayer(args[0]);
-        if(args[0].equals(sender.getName())) {
-            PrimPlugin.send(sender, Utils.parse(i18n.getString("selfSpecified"), placeholders));
-            return true;
-        }
+        placeholders.add(new Placeholder("player", player));
+        placeholders.add(new Placeholder("receiver", player));
 
-        if(args.length < 2) {
-            PrimPlugin.send(sender, Utils.parse(config.getString("errors.specifyMessage"), placeholders));
-            return true;
-        }
+        // Проверяем, не указал ли игрок самого себя (с шизой может и в реальность
+        // пообщаться)
+        if(player.equals(sender.getName()))
+            return Utils.parse(PrimPlugin.i18n.getString("selfSpecified"), placeholders);
 
-        String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+        Player receiver = Bukkit.getPlayer(player);
+        PrimPlayer primPlayer = PrimPlugin.driver.getPlayer(player);
+
+        // Проверяем, можем ли мы отправить указанному игроку приватное сообщение
+        if(receiver == null && primPlayer == null)
+            return Utils.parse(PrimPlugin.i18n.getString("playerNotFound"), placeholders);
+
+        // Получаем сообщение (поскольку там тип "String", то оно автоматом берёт всё
+        // после 1 аргумента) и добавляем его как заполнитель
+        String message = String.valueOf(Objects.requireNonNull(args.getArgument("message")).getValue());
         placeholders.add(new Placeholder("message", message));
 
-        MySQLDriver driver = PrimPlugin.getInstance().getDriver();
-        if(receiver == null && !driver.playerExists(args[0])) {
-            PrimPlugin.send(sender, Utils.parse(i18n.getString("playerNotFound"), placeholders));
-            return true;
-        }
-
         sender.sendMessage(Utils.parse(config.getString("sender.message"), placeholders));
-        if(!(sender instanceof ConsoleCommandSender))
-            Utils.playSound((Player) sender, config.getString("sender.sound", null));
-
-        ChatOptions chat = driver.getChatSettings(args[0]);
         if(receiver != null) {
             receiver.sendMessage(Utils.parse(config.getString("receiver.message"), placeholders));
-            String sound = chat.getSound();
-            if(sound != null)
-                Utils.playSound(receiver, sound.equals("$DEFAULT") ? config.getString("receiver.sound", null) : sound);
-
-            return true;
+            Utils.playSound(receiver, primPlayer.getChat().getSound());
+            return null;
         }
 
-        driver.addMessage(args[0], new Message(sender.getName(), message, LocalDateTime.now()));
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, @NotNull String @NotNull [] args) {
-        if(Math.max(args.length-1, 0) == 1)
-            return PrimPlugin.getOnlinePlayersNames();
-
+        primPlayer.sendMessage(sender.getName(), message);
         return null;
     }
 
-    public void updateConfig(Config config) {
-        this.config = config;
+    /**
+     * Получить подсказку для указанного аргумента
+     *
+     * @param previous Предыдущие аргументы
+     * @param argument Данные об аргументе, подсказку для которого нужно получить
+     * @return Список строк
+     */
+    @Override
+    public List<String> getSuggestionsFor(Arguments previous, Argument argument) {
+        return null;
     }
 }

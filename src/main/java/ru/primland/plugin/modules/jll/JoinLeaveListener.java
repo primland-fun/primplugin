@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.WhitelistCommand;
+import ru.primland.plugin.commands.whitelist.WhitelistCommand;
 import ru.primland.plugin.modules.cards.GiveBoxCommand;
 import ru.primland.plugin.modules.recipes.CustomRecipes;
 import ru.primland.plugin.utils.Utils;

@@ -1,4 +1,4 @@
-package ru.primland.plugin.commands;
+package ru.primland.plugin.commands.reputation;
 
 import io.github.stngularity.epsilon.engine.placeholders.IPlaceholder;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.commands.manager.annotations.CommandInfo;
 import ru.primland.plugin.utils.Utils;
 import ru.primland.plugin.database.MySQLDriver;
 import ru.primland.plugin.database.data.subdata.Reputation;
@@ -18,8 +19,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@CommandInfo(
+        name="reputation",
+        description="Управление репутацией игроков",
+        aliases={"rep"}
+)
 public class ReputationCommand implements TabExecutor {
-    private Config config;
+    public static Config config;
 
     public ReputationCommand(Config config) {
         this.config = config;

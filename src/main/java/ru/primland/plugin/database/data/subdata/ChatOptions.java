@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import ru.primland.plugin.commands.PrivateMessage;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -66,6 +67,17 @@ public class ChatOptions {
         AtomicInteger output = new AtomicInteger();
         flags.forEach(flag -> output.set(output.get() | flag.getValue()));
         return output.get();
+    }
+
+    /**
+     * Получить звук для проигрывания при получении приватного сообщения
+     * @return Строка, обозначающая звук
+     */
+    public @Nullable String getSoundForPlay() {
+        if(getFlags().contains(MessagesFlag.DISABLE_PM_SOUND))
+            return null;
+
+        return sound == null ? PrivateMessage.config.getString("receiver.sound", null) : sound;
     }
 
     @Getter @AllArgsConstructor

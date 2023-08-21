@@ -9,10 +9,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.commands.*;
+import ru.primland.plugin.commands.manager.CommandManager;
 import ru.primland.plugin.commands.plugin.HelpCommand;
 import ru.primland.plugin.commands.plugin.InfoCommand;
 import ru.primland.plugin.commands.plugin.PluginPrimaryCommand;
 import ru.primland.plugin.commands.plugin.ReloadCommand;
+import ru.primland.plugin.commands.reputation.ReputationCommand;
+import ru.primland.plugin.commands.whitelist.WhitelistCommand;
 import ru.primland.plugin.database.MySQLDriver;
 import ru.primland.plugin.modules.IPluginModule;
 import ru.primland.plugin.modules.ModuleManager;
@@ -40,7 +43,6 @@ public class PrimPlugin extends JavaPlugin {
     public static LuckPerms lpApi;
 
     private PrivateMessage privateMessageCommand;
-    private KickCommand kickCommand;
     private MCHelpCommand helpCommand;
     private ReputationCommand repCommand;
 
@@ -59,6 +61,10 @@ public class PrimPlugin extends JavaPlugin {
 
         // Пытаемся получить доступ к API LuckPerms
         lpApi = getLuckPermsApi();
+
+        // Регистрируем команды плагина
+        CommandManager.init();
+        CommandManager.registerAll();
 
         // Регистрируем команду плагина
         command = new PluginPrimaryCommand();
@@ -93,28 +99,16 @@ public class PrimPlugin extends JavaPlugin {
         manager.enableModules();
 
         // Регистрируем команду `/msg`
-        privateMessageCommand = new PrivateMessage(Config.load("commands/private_messages.yml"));
-        PluginCommand msgCommand = getCommand("msg");
-        if(msgCommand == null) {
-            send(i18n.getString("registerError"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        //privateMessageCommand = new PrivateMessage(Config.load("commands/private_messages.yml"));
+        //PluginCommand msgCommand = getCommand("msg");
+        //if(msgCommand == null) {
+        //    send(i18n.getString("registerError"));
+        //    getServer().getPluginManager().disablePlugin(this);
+        //    return;
+        //}
 
-        msgCommand.setExecutor(privateMessageCommand);
-        msgCommand.setTabCompleter(privateMessageCommand);
-
-        // Регистрируем команду `/kick`
-        kickCommand = new KickCommand(Config.load("commands/kick.yml"));
-        PluginCommand mcKickCommand = getCommand("kick");
-        if(mcKickCommand == null) {
-            send(i18n.getString("registerError"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        mcKickCommand.setExecutor(kickCommand);
-        mcKickCommand.setTabCompleter(kickCommand);
+        //msgCommand.setExecutor(privateMessageCommand);
+        //msgCommand.setTabCompleter(privateMessageCommand);
 
         // Регистрируем команду `/help`
         helpCommand = new MCHelpCommand(Config.load("commands/minecraft_help.yml"));
@@ -139,15 +133,15 @@ public class PrimPlugin extends JavaPlugin {
         mcRepCommand.setExecutor(repCommand);
 
         // Регистрируем команду `/plwl`
-        whitelistCommand = new WhitelistCommand(Config.load("commands/whitelist.yml"));
-        PluginCommand mcWlCommand = getCommand("plwl");
-        if(mcWlCommand == null) {
-            send(i18n.getString("registerError"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        //whitelistCommand = new WhitelistCommand(Config.load("commands/whitelist.yml"));
+        //PluginCommand mcWlCommand = getCommand("plwl");
+        //if(mcWlCommand == null) {
+        //    send(i18n.getString("registerError"));
+        //    getServer().getPluginManager().disablePlugin(this);
+        //    return;
+        //}
 
-        mcWlCommand.setExecutor(whitelistCommand);
+        //mcWlCommand.setExecutor(whitelistCommand);
     }
 
     public void connectToDatabase() {
@@ -195,15 +189,18 @@ public class PrimPlugin extends JavaPlugin {
         config.reload();
         i18n.reload();
 
-        privateMessageCommand.updateConfig(Config.load("commands/private_messages.yml"));
-        kickCommand.updateConfig(Config.load("commands/kick.yml"));
+        //privateMessageCommand.updateConfig(Config.load("commands/private_messages.yml"));
         helpCommand.updateConfig(Config.load("commands/minecraft_help.yml"));
         repCommand.updateConfig(Config.load("reputation.yml"));
-        whitelistCommand.reload();
+        //whitelistCommand.reload();
 
         // Заново подключаемся к базе данных
         driver.disconnect();
         connectToDatabase();
+
+        // Снимаем регистрацию с команд и регистрируем их заново
+        CommandManager.unregisterAll();
+        CommandManager.registerAll();
 
         // Перезагружаем JLl
         listener.disable();
