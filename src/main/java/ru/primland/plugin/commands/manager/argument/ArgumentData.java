@@ -1,4 +1,4 @@
-package ru.primland.plugin.commands.manager;
+package ru.primland.plugin.commands.manager.argument;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

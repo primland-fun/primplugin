@@ -1,4 +1,4 @@
-package ru.primland.plugin.commands.manager.annotations;
+package ru.primland.plugin.commands.manager.argument;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +15,9 @@ public @interface Argument {
 
     // Тип аргумента
     @NotNull Class<?> type();
+
+    // Является ли строка текстом
+    boolean stringIsText() default false;
 
     // Отображаемое название
     @NotNull String displayName() default "";

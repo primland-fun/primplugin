@@ -7,8 +7,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.annotations.Argument;
-import ru.primland.plugin.commands.manager.annotations.CommandInfo;
+import ru.primland.plugin.commands.manager.argument.Argument;
 import ru.primland.plugin.utils.Utils;
 
 import java.lang.reflect.Field;

@@ -3,7 +3,8 @@ package ru.primland.plugin.commands.manager;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.annotations.Argument;
+import ru.primland.plugin.commands.manager.argument.Argument;
+import ru.primland.plugin.commands.manager.argument.Arguments;
 
 import java.util.List;
 

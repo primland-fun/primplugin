@@ -9,11 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.Arguments;
+import ru.primland.plugin.commands.manager.argument.Arguments;
 import ru.primland.plugin.commands.manager.ICommand;
-import ru.primland.plugin.commands.manager.annotations.Argument;
-import ru.primland.plugin.commands.manager.annotations.ArgumentSuggestion;
-import ru.primland.plugin.commands.manager.annotations.CommandInfo;
+import ru.primland.plugin.commands.manager.argument.Argument;
+import ru.primland.plugin.commands.manager.argument.ArgumentSuggestion;
+import ru.primland.plugin.commands.manager.CommandInfo;
 import ru.primland.plugin.database.data.PrimPlayer;
 import ru.primland.plugin.utils.Utils;
 
@@ -28,8 +28,8 @@ import java.util.Objects;
         arguments={
                 // При указании Player как тип getValue() будет возвращать строку
                 @Argument(name="receiver", type=Player.class, displayName="игрок", required=true),
-                @Argument(name="message", type=String.class, displayName="сообщение", required=true,
-                        dynamicSuggestion=ArgumentSuggestion.ONLINE_PLAYERS)
+                @Argument(name="message", type=String.class, stringIsText=true, displayName="сообщение",
+                        required=true, dynamicSuggestion=ArgumentSuggestion.ONLINE_PLAYERS)
         }
 )
 public class PrivateMessage implements ICommand {
@@ -89,8 +89,7 @@ public class PrivateMessage implements ICommand {
         if(receiver == null && primPlayer == null)
             return Utils.parse(PrimPlugin.i18n.getString("playerNotFound"), placeholders);
 
-        // Получаем сообщение (поскольку там тип "String", то оно автоматом берёт всё
-        // после 1 аргумента) и добавляем его как заполнитель
+        // Получаем сообщение и добавляем его как заполнитель
         String message = String.valueOf(Objects.requireNonNull(args.getArgument("message")).getValue());
         placeholders.add(new Placeholder("message", message));
 

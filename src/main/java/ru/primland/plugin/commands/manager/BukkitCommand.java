@@ -4,7 +4,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.annotations.CommandInfo;
 
 import java.util.List;
 

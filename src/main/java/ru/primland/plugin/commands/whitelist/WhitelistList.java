@@ -4,10 +4,10 @@ import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.Arguments;
+import ru.primland.plugin.commands.manager.argument.Arguments;
 import ru.primland.plugin.commands.manager.ICommand;
-import ru.primland.plugin.commands.manager.annotations.Argument;
-import ru.primland.plugin.commands.manager.annotations.CommandInfo;
+import ru.primland.plugin.commands.manager.argument.Argument;
+import ru.primland.plugin.commands.manager.CommandInfo;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.List;

@@ -1,6 +1,7 @@
-package ru.primland.plugin.commands.manager.annotations;
+package ru.primland.plugin.commands.manager;
 
 import org.jetbrains.annotations.NotNull;
+import ru.primland.plugin.commands.manager.argument.Argument;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
