@@ -7,7 +7,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.argument.Argument;
+import ru.primland.plugin.commands.manager.argument.annotation.Argument;
 import ru.primland.plugin.utils.Utils;
 
 import java.lang.reflect.Field;
@@ -41,7 +41,7 @@ public class CommandManager {
      * ICommand и вызывает функции регистрации для каждой)
      */
     public static void registerAll() {
-        ServiceLoader<ICommand> loader = ServiceLoader.load(ICommand.class);
+        ServiceLoader<Command> loader = ServiceLoader.load(Command.class);
         loader.forEach(CommandManager::register);
         checkSubCommands();
     }
@@ -69,7 +69,7 @@ public class CommandManager {
      *
      * @param command Объект реализации команды
      */
-    public static void register(@NotNull ICommand command) {
+    public static void register(@NotNull Command command) {
         // Получаем и проверяем информацию о команде
         CommandInfo info = command.getClass().getAnnotation(CommandInfo.class);
         if(info == null) {

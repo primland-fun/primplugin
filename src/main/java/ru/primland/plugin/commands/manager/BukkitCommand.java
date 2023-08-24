@@ -1,16 +1,15 @@
 package ru.primland.plugin.commands.manager;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
 
 import java.util.List;
 
-public class BukkitCommand extends Command {
+public class BukkitCommand extends org.bukkit.command.Command {
     private final CommandInfo info;
 
-    public BukkitCommand(ICommand command, @NotNull CommandInfo info) {
+    public BukkitCommand(Command command, @NotNull CommandInfo info) {
         super(info.name(), info.description(), CommandManager.getUsage(info), List.of(info.aliases()));
         this.info = info;
     }

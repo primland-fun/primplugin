@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter @Setter @AllArgsConstructor
 public class CachedCommand {
     // Объект команды
-    private @NotNull ICommand command;
+    private @NotNull Command command;
 
     // Информация о команде
     private @NotNull CommandInfo info;

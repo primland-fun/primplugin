@@ -1,7 +1,6 @@
 package ru.primland.plugin.commands.manager;
 
 import org.jetbrains.annotations.NotNull;
-import ru.primland.plugin.commands.manager.argument.Argument;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,9 +27,6 @@ public @interface CommandInfo {
 
     // Требуемое для использования команды право, не обязательно
     @NotNull String permission() default "";
-
-    // Аргументы команды
-    @NotNull Argument[] arguments() default {};
 
     // Родительская команда
     @NotNull String parent() default "";

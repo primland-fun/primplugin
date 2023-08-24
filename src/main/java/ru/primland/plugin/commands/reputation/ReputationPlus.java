@@ -2,15 +2,13 @@ package ru.primland.plugin.commands.reputation;
 
 import io.github.stngularity.epsilon.engine.placeholders.IPlaceholder;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.argument.Arguments;
-import ru.primland.plugin.commands.manager.ICommand;
-import ru.primland.plugin.commands.manager.argument.Argument;
+import ru.primland.plugin.commands.manager.Command;
+import ru.primland.plugin.commands.manager.CommandContext;
 import ru.primland.plugin.commands.manager.CommandInfo;
+import ru.primland.plugin.commands.manager.argument.type.PlayerArgument;
 import ru.primland.plugin.database.data.PrimPlayer;
 import ru.primland.plugin.database.data.subdata.Reputation;
 import ru.primland.plugin.utils.Utils;
@@ -23,10 +21,9 @@ import java.util.Objects;
 @CommandInfo(
         name="+",
         description="Press F to p... Дать другому игроку 1 репутацию",
-        parent="rep",
-        arguments={@Argument(name="player", type=Player.class, displayName="игрок", required=true)}
+        parent="rep"
 )
-public class ReputationPlus implements ICommand {
+public class ReputationPlus extends Command {
     // TODO: calc remaining time and use in error
 
     /**
@@ -34,45 +31,39 @@ public class ReputationPlus implements ICommand {
      *
      * @param plugin Экземпляр плагина
      */
-    @Override
-    public void load(PrimPlugin plugin) {}
+    public void load(PrimPlugin plugin) {
+        addArgument(new PlayerArgument<PrimPlayer>("player", "игрок", true));
+    }
 
     /**
      * Отгрузить данные команды
      *
      * @param plugin Экземпляр плагина
      */
-    @Override
     public void unload(PrimPlugin plugin) {}
 
     /**
      * Выполнить команду с указанными данными
      *
-     * @param sender Отправитель команды
-     * @param args   Аргументы команды
+     * @param ctx Контекст команды
      * @return Сообщение для отправителя команды
      */
-    @Override
-    public @Nullable String execute(@NotNull CommandSender sender, @NotNull Arguments args) {
+    public @Nullable String execute(@NotNull CommandContext ctx) {
         List<IPlaceholder> placeholders = new ArrayList<>();
-        placeholders.add(new Placeholder("sender", sender.getName()));
+        placeholders.add(new Placeholder("sender", ctx.sender.getName()));
 
-        String player = (String) Objects.requireNonNull(args.getArgument("player")).getValue();
-        placeholders.add(new Placeholder("player", player));
-        if(player.equals(sender.getName()))
+        PrimPlayer player = Objects.requireNonNull(ctx.get("player"));
+        placeholders.add(new Placeholder("player", player.getName()));
+        if(player.getName().equals(ctx.sender.getName()))
             return Utils.parse(PrimPlugin.i18n.getString("selfSpecified"), placeholders);
 
-        PrimPlayer primPlayer = PrimPlugin.driver.getPlayer(player);
-        if(primPlayer == null)
-            return Utils.parse(PrimPlugin.i18n.getString("playerNotFound"), placeholders);
-
-        Reputation reputation = primPlayer.getReputation();
+        Reputation reputation = player.getReputation();
         if(reputation.getValue() == ReputationCommand.config.getInteger("maxReputation", 100)) {
             return Utils.parse(ReputationCommand.config.getString("errors.reputationMaxLimit"),
                     placeholders);
         }
 
-        PrimPlayer primSender = PrimPlugin.driver.getPlayer(sender.getName());
+        PrimPlayer primSender = PrimPlugin.driver.getPlayer(ctx.sender.getName());
         if(primSender == null)
             return PrimPlugin.i18n.getString("youNotFound");
 
@@ -80,23 +71,11 @@ public class ReputationPlus implements ICommand {
             return ReputationCommand.config.getString("errors.canNotUse");
 
         reputation.setValue(reputation.getValue()+1);
-        primPlayer.updateReputation(reputation);
+        player.updateReputation(reputation);
 
         Reputation sReputation = primSender.getReputation();
         sReputation.setLastAction(LocalDateTime.now());
         primSender.updateReputation(sReputation);
         return Utils.parse(ReputationCommand.config.getString("messages.give"), placeholders);
-    }
-
-    /**
-     * Получить подсказку для указанного аргумента
-     *
-     * @param previous Предыдущие аргументы
-     * @param argument Данные об аргументе, подсказку для которого нужно получить
-     * @return Список строк
-     */
-    @Override
-    public List<String> getSuggestionsFor(Arguments previous, Argument argument) {
-        return null;
     }
 }

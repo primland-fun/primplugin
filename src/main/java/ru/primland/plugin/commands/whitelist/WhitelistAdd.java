@@ -1,14 +1,13 @@
 package ru.primland.plugin.commands.whitelist;
 
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
-import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.argument.Arguments;
-import ru.primland.plugin.commands.manager.ICommand;
-import ru.primland.plugin.commands.manager.argument.Argument;
+import ru.primland.plugin.commands.manager.Command;
+import ru.primland.plugin.commands.manager.CommandContext;
 import ru.primland.plugin.commands.manager.CommandInfo;
+import ru.primland.plugin.commands.manager.argument.type.StringArgument;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.List;
@@ -18,37 +17,34 @@ import java.util.Objects;
         name="add",
         description="Добавить игрока в белый список",
         permission="primplugin.commands.whitelist.add",
-        parent="plwl",
-        arguments={@Argument(name="name", type=String.class, displayName="ник игрока", required=true)}
+        parent="plwl"
 )
-public class WhitelistAdd implements ICommand {
+public class WhitelistAdd extends Command {
     /**
      * Загрузить данные команды
      *
      * @param plugin Экземпляр плагина
      */
-    @Override
-    public void load(PrimPlugin plugin) {}
+    public void load(PrimPlugin plugin) {
+        addArgument(new StringArgument("name", "ник игрока", true));
+    }
 
     /**
      * Отгрузить данные команды
      *
      * @param plugin Экземпляр плагина
      */
-    @Override
     public void unload(PrimPlugin plugin) {}
 
     /**
      * Выполнить команду с указанными данными
      *
-     * @param sender Отправитель команды
-     * @param args   Аргументы команды
+     * @param ctx Контекст команды
      * @return Сообщение для отправителя команды
      */
-    @Override
-    public @Nullable String execute(CommandSender sender, @NotNull Arguments args) {
+    public @Nullable String execute(@NotNull CommandContext ctx) {
         // Получаем ник игрока, которого надо добавить в белый список
-        String name = (String) Objects.requireNonNull(args.getArgument("name")).getValue();
+        String name = Objects.requireNonNull(ctx.get("name"));
 
         // Проверяем, есть ли игрок в белом списке, если да, то выдаём ошибку
         List<String> whitelist = WhitelistCommand.config.getStringList("whitelist");
@@ -62,17 +58,5 @@ public class WhitelistAdd implements ICommand {
         WhitelistCommand.config.save();
         return Utils.parse(WhitelistCommand.config.getString("messages.add"),
                 new Placeholder("player", name));
-    }
-
-    /**
-     * Получить подсказку для указанного аргумента
-     *
-     * @param previous Предыдущие аргументы
-     * @param argument Данные об аргументе, подсказку для которого нужно получить
-     * @return Список строк
-     */
-    @Override
-    public List<String> getSuggestionsFor(Arguments previous, Argument argument) {
-        return null;
     }
 }
