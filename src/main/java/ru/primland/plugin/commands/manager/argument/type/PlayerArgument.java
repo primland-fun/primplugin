@@ -31,14 +31,14 @@ public class PlayerArgument<T> extends Argument<T> {
     @SuppressWarnings("unchecked")
     private @NotNull BiFunction<ArgumentContext, String[], ArgumentOut<T>> get = (ctx, value) -> {
         if(getTypeVar().equals(Player.class) && Bukkit.getPlayer(value[0]) == null)
-            return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.PLAYER_NOT_FOUND);
+            return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.PLAYER_NOT_FOUND, value[0]);
 
         if(getTypeVar().equals(Player.class))
-            return (ArgumentOut<T>) new ArgumentOut<>(1, Bukkit.getPlayer(value[0]), null);
+            return (ArgumentOut<T>) new ArgumentOut<>(1, Bukkit.getPlayer(value[0]), null, null);
 
         PrimPlayer player = PrimPlugin.driver.getPlayer(value[0]);
         if(getTypeVar().equals(PrimPlayer.class) && player == null && Bukkit.getPlayer(value[0]) == null)
-            return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.DATABASE_PLAYER_NOT_FOUND);
+            return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.DATABASE_PLAYER_NOT_FOUND, value[0]);
 
         if(getTypeVar().equals(PrimPlayer.class) && player == null) {
             PrimPlugin.driver.addPlayer(Objects.requireNonNull(Bukkit.getPlayer(value[0])));
@@ -46,9 +46,9 @@ public class PlayerArgument<T> extends Argument<T> {
         }
 
         if(getTypeVar().equals(PrimPlayer.class))
-            return (ArgumentOut<T>) new ArgumentOut<>(1, player, null);
+            return (ArgumentOut<T>) new ArgumentOut<>(1, player, null, null);
 
-        return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.INVALID_TYPE_VAR);
+        return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.INVALID_TYPE_VAR, null);
     };
 
     /**

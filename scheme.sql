@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS players (
     name VARCHAR(16) NOT NULL,
+    birthday BIGINT,
     daily_strike INT,
     `chat.sound` TEXT,
     `chat.lastReceived` VARCHAR(16),

@@ -28,6 +28,9 @@ public @interface CommandInfo {
     // Требуемое для использования команды право, не обязательно
     @NotNull String permission() default "";
 
+    // Эту команду могут выполнять только игроки?
+    boolean playersOnly() default false;
+
     // Родительская команда
     @NotNull String parent() default "";
 }

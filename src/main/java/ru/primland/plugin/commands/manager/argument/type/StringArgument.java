@@ -24,7 +24,7 @@ public class StringArgument extends Argument<String> {
      * На выход: значение аргумента
      */
     private @NotNull BiFunction<ArgumentContext, String[], ArgumentOut<String>> get = (ctx, value) ->
-            new ArgumentOut<>(1, value[0], null);
+            new ArgumentOut<>(1, value[0], null, null);
 
     /**
      * Отображаемое в подсказке название аргумента

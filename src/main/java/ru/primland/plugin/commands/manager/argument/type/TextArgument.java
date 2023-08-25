@@ -24,7 +24,7 @@ public class TextArgument extends Argument<String> {
      * На выход: значение аргумента
      */
     private @NotNull BiFunction<ArgumentContext, String[], ArgumentOut<String>> get = (ctx, value) ->
-            new ArgumentOut<>(value.length, String.join(" ", value), null);
+            new ArgumentOut<>(value.length, String.join(" ", value), null, null);
 
     /**
      * Отображаемое в подсказке название аргумента

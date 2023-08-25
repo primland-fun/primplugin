@@ -33,6 +33,9 @@ public class PrimPlayer {
     // Ник игрока
     private final @NotNull String name;
 
+    // Дата рождения игрока
+    private @Nullable LocalDateTime birthday;
+
     // Количество дней подряд, которые игрок прописывал
     // команду /daily
     private int dailyStrike;
@@ -80,6 +83,19 @@ public class PrimPlayer {
      */
     public void plusDayToDailyStrike() {
         setDailyStrike(dailyStrike+1);
+    }
+
+    /**
+     * Установить дату рождения игрока
+     *
+     * @param birthday Новая дата рождения
+     */
+    public void setBirthday(LocalDateTime birthday) {
+        this.birthday = birthday;
+
+        // Обновляем и в базе данных
+        driver.execute("UPDATE %splayers SET birthday=%d WHERE name='%s'".formatted(driver.getPrefix(),
+                Utils.convertTimeToTimestamp(birthday), name));
     }
 
     /**

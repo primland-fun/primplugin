@@ -27,7 +27,7 @@ public class Argument<T> {
      */
     @SuppressWarnings("unchecked")
     private @NotNull BiFunction<ArgumentContext, String[], ArgumentOut<T>> get = (ctx, value) ->
-            (ArgumentOut<T>) new ArgumentOut<>(value.length, String.join(" ", value), null);
+            (ArgumentOut<T>) new ArgumentOut<>(value.length, String.join(" ", value), null, null);
 
     /**
      * Отображаемое в подсказке название аргумента

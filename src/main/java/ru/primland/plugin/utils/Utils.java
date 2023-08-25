@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -114,6 +115,10 @@ public class Utils {
     @Contract("_ -> new")
     public static @NotNull LocalDateTime convertTimestampToTime(long timestamp) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());
+    }
+
+    public static long convertTimeToTimestamp(LocalDateTime time) {
+        return Timestamp.valueOf(time).getTime();
     }
 
     public static <K, V> @NotNull Map<K, V> search(@NotNull Map<K, V> original, Function<V, Boolean> filter) {

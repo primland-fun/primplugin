@@ -13,6 +13,7 @@ import ru.primland.plugin.database.data.gifts.GiftContent;
 import ru.primland.plugin.database.data.gifts.GiftType;
 import ru.primland.plugin.database.data.gifts.GlobalGift;
 import ru.primland.plugin.database.data.subdata.*;
+import ru.primland.plugin.utils.Utils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -299,6 +300,7 @@ public class MySQLDriver {
 
             return new PrimPlayer(
                     this, name,
+                    Utils.convertTimestampToTime(result.getLong("birthday")),
                     result.getInt("daily_strike"),
                     new ChatOptions(
                             result.getString("chat.sound"),

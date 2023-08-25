@@ -1,16 +1,23 @@
 package ru.primland.plugin.commands.manager;
 
+import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.commands.manager.argument.ArgumentOut;
+import ru.primland.plugin.commands.manager.argument.type.Argument;
+import ru.primland.plugin.utils.Utils;
 
 import java.util.List;
 
 public class BukkitCommand extends org.bukkit.command.Command {
+    private final Command original;
     private final CommandInfo info;
 
     public BukkitCommand(Command command, @NotNull CommandInfo info) {
-        super(info.name(), info.description(), CommandManager.getUsage(info), List.of(info.aliases()));
+        super(info.name(), info.description(), CommandManager.getUsage(command), List.of(info.aliases()));
+        this.original = command;
         this.info = info;
     }
 
@@ -21,8 +28,51 @@ public class BukkitCommand extends org.bukkit.command.Command {
             return true;
         }
 
+        if(info.onlyPlayers() && sender instanceof ConsoleCommandSender) {
+            PrimPlugin.send(PrimPlugin.i18n.getString("playersOnly"));
+            return true;
+        }
 
+        GetContextOutput output = CommandContext.getContext(sender, args, original.getArguments());
+        CommandContext context = output.context();
+        ArgumentOut.ArgumentError error = output.error();
+        Object data = output.errorData();
 
+        if(error != null && error.equals(ArgumentOut.ArgumentError.PLAYER_NOT_FOUND)) {
+            PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("playerNotFound"), new Placeholder("player", data)));
+            return true;
+        }
+
+        if(error != null && error.equals(ArgumentOut.ArgumentError.DATABASE_PLAYER_NOT_FOUND)) {
+            PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("databasePlayerNotFound"),
+                    new Placeholder("player", data)));
+
+            return true;
+        }
+
+        if(error != null && Utils.equalsOne(error, ArgumentOut.ArgumentError.INVALID_TYPE_VAR,
+                ArgumentOut.ArgumentError.FAILED_TO_PARSE_ARGUMENT)) {
+            PrimPlugin.send(PrimPlugin.i18n.getString("internalError"));
+            return true;
+        }
+
+        if(error != null && error.equals(ArgumentOut.ArgumentError.NOT_ENOUGH_ARGUMENTS)) {
+            Argument<?> argument = data == null ? null : (Argument<?>) data;
+            String placeholder = argument == null ? "null" : (argument.getDisplayName() == null ?
+                    argument.getName() : argument.getDisplayName());
+
+            PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("notEnoughArguments"),
+                    new Placeholder("argument", placeholder)));
+
+            return true;
+        }
+
+        if(context == null) {
+            PrimPlugin.send(PrimPlugin.i18n.getString("internalError"));
+            return true;
+        }
+
+        context.send(original.execute(context));
         return true;
     }
 

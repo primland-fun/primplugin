@@ -7,7 +7,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.manager.argument.annotation.Argument;
+import ru.primland.plugin.commands.manager.argument.type.Argument;
 import ru.primland.plugin.utils.Utils;
 
 import java.lang.reflect.Field;
@@ -140,15 +140,15 @@ public class CommandManager {
     /**
      * Сформировать строку использования для команды
      *
-     * @param info Информация о команде
+     * @param command Объект команды
      * @return Сформированная строка использования
      */
-    public static @NotNull String getUsage(@NotNull CommandInfo info) {
+    public static @NotNull String getUsage(@NotNull Command command) {
         StringBuilder builder = new StringBuilder();
-        for(Argument argument : info.arguments()) {
-            builder.append(argument.required() ? "{" : "[");
-            builder.append(argument.displayName().isEmpty() ? argument.name() : argument.displayName());
-            builder.append(argument.required() ? "}" : "]");
+        for(Argument<?> argument : command.getArguments()) {
+            builder.append(argument.isRequired() ? "{" : "[");
+            builder.append(argument.getDisplayName() == null ? argument.getName() : argument.getDisplayName());
+            builder.append(argument.isRequired() ? "}" : "]");
             builder.append(" ");
         }
 
