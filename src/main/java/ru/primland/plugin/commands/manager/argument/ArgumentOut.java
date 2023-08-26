@@ -9,6 +9,7 @@ public record ArgumentOut<T>(int size, @Nullable T output, @Nullable ArgumentErr
         INVALID_TYPE_VAR,
         NOT_ENOUGH_ARGUMENTS,
         FAILED_TO_PARSE_ARGUMENT,
-        PLAYER_SELF_SPECIFIED
+        PLAYER_SELF_SPECIFIED,
+        NUMBER_REQUIRED
     }
 }

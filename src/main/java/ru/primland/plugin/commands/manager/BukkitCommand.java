@@ -5,11 +5,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.commands.manager.argument.ArgumentContext;
 import ru.primland.plugin.commands.manager.argument.ArgumentOut;
+import ru.primland.plugin.commands.manager.argument.GetArgumentContextOutput;
 import ru.primland.plugin.commands.manager.argument.type.Argument;
 import ru.primland.plugin.commands.manager.argument.type.PlayerArgument;
 import ru.primland.plugin.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +97,11 @@ public class BukkitCommand extends org.bukkit.command.Command {
             return true;
         }
 
+        if(error != null && error.equals(ArgumentOut.ArgumentError.NUMBER_REQUIRED)) {
+            PrimPlugin.send(PrimPlugin.i18n.getString("numberRequired"));
+            return true;
+        }
+
         if(context == null) {
             PrimPlugin.send(PrimPlugin.i18n.getString("internalError"));
             return true;
@@ -108,6 +116,26 @@ public class BukkitCommand extends org.bukkit.command.Command {
 
     @Override
     public @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String s, @NotNull String[] args) {
-        return List.of();
+        Map<String, CachedCommand> subcommands = CommandManager.searchSubCommands(info.name());
+        if(!subcommands.isEmpty() && args.length == 0) {
+            List<String> output = new ArrayList<>();
+            subcommands.forEach((name, cmd) -> {
+                if(cmd.getInfo().permission().isEmpty() || sender.hasPermission(cmd.getInfo().permission()))
+                    output.add(name);
+            });
+
+            return output;
+        }
+
+        try {
+            Argument<?> argument = original.getArguments().get(args.length-2);
+            GetArgumentContextOutput output = ArgumentContext.getContext(sender, args, original.getArguments(), argument);
+            if(output.context() == null)
+                return List.of();
+            
+            return argument.getSuggests().apply(output.context());
+        } catch(IndexOutOfBoundsException error) {
+            return List.of();
+        }
     }
 }
