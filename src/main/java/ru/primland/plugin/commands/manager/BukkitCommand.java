@@ -7,9 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.commands.manager.argument.ArgumentOut;
 import ru.primland.plugin.commands.manager.argument.type.Argument;
+import ru.primland.plugin.commands.manager.argument.type.PlayerArgument;
 import ru.primland.plugin.utils.Utils;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class BukkitCommand extends org.bukkit.command.Command {
     private final Command original;
@@ -28,8 +31,20 @@ public class BukkitCommand extends org.bukkit.command.Command {
             return true;
         }
 
-        if(info.onlyPlayers() && sender instanceof ConsoleCommandSender) {
+        if(info.playersOnly() && sender instanceof ConsoleCommandSender) {
             PrimPlugin.send(PrimPlugin.i18n.getString("playersOnly"));
+            return true;
+        }
+
+        Map<String, CachedCommand> subcommands = CommandManager.searchSubCommands(info.name());
+        if(!subcommands.isEmpty() && args.length > 0) {
+            CachedCommand command = subcommands.get(args[0]);
+            if(command == null) {
+                PrimPlugin.send(PrimPlugin.i18n.getString("subcommandNotFound"));
+                return true;
+            }
+
+            command.getBukkitCommand().execute(sender, s, Arrays.copyOfRange(args, 1, args.length));
             return true;
         }
 
@@ -58,6 +73,13 @@ public class BukkitCommand extends org.bukkit.command.Command {
 
         if(error != null && error.equals(ArgumentOut.ArgumentError.NOT_ENOUGH_ARGUMENTS)) {
             Argument<?> argument = data == null ? null : (Argument<?>) data;
+            if(data instanceof PlayerArgument<?>) {
+                PrimPlugin.send(PrimPlugin.i18n.getString("specifyPlayer" + (((PlayerArgument<?>) data)
+                        .isRequireNotSelf() ? "NotSelf" : "")));
+
+                return true;
+            }
+
             String placeholder = argument == null ? "null" : (argument.getDisplayName() == null ?
                     argument.getName() : argument.getDisplayName());
 
@@ -67,12 +89,20 @@ public class BukkitCommand extends org.bukkit.command.Command {
             return true;
         }
 
+        if(error != null && error.equals(ArgumentOut.ArgumentError.PLAYER_SELF_SPECIFIED)) {
+            PrimPlugin.send(PrimPlugin.i18n.getString("selfSpecified"));
+            return true;
+        }
+
         if(context == null) {
             PrimPlugin.send(PrimPlugin.i18n.getString("internalError"));
             return true;
         }
 
-        context.send(original.execute(context));
+        String result = original.execute(context);
+        context.send((result != null && result.equals(OutputConstants.help)) ?
+                CommandManager.buildHelpFor(info) : result);
+
         return true;
     }
 

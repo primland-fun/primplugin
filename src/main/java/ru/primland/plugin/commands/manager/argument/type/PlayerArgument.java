@@ -30,6 +30,9 @@ public class PlayerArgument<T> extends Argument<T> {
      */
     @SuppressWarnings("unchecked")
     private @NotNull BiFunction<ArgumentContext, String[], ArgumentOut<T>> get = (ctx, value) -> {
+        if(value[0].equals(ctx.sender.getName()))
+            return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.PLAYER_SELF_SPECIFIED, null);
+
         if(getTypeVar().equals(Player.class) && Bukkit.getPlayer(value[0]) == null)
             return new ArgumentOut<>(0, null, ArgumentOut.ArgumentError.PLAYER_NOT_FOUND, value[0]);
 
@@ -62,14 +65,20 @@ public class PlayerArgument<T> extends Argument<T> {
     private boolean required;
 
     /**
+     * Требовать любого игрока кроме себя?
+     */
+    private boolean requireNotSelf;
+
+    /**
      * Лямбда-функция для получения предложения
      */
     private @NotNull Function<ArgumentContext, List<String>> suggests = (ctx) -> PrimPlugin.getOnlinePlayersNames();
 
-    public PlayerArgument(@NotNull String name, @Nullable String displayName, boolean required) {
+    public PlayerArgument(@NotNull String name, @Nullable String displayName, boolean required, boolean requireNotSelf) {
         this.name = name;
         this.displayName = displayName;
         this.required = required;
+        this.requireNotSelf = requireNotSelf;
     }
 
     /**

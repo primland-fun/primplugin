@@ -1,5 +1,6 @@
 package ru.primland.plugin.commands.manager;
 
+import io.github.stngularity.epsilon.engine.placeholders.IPlaceholder;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
@@ -11,9 +12,7 @@ import ru.primland.plugin.commands.manager.argument.type.Argument;
 import ru.primland.plugin.utils.Utils;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * Менеджер команд
@@ -154,5 +153,40 @@ public class CommandManager {
 
         return (builder.charAt(builder.length()-1) == ' ' ? builder.deleteCharAt(
                 builder.length()-1) : builder).toString();
+    }
+
+    /**
+     * Сформировать справку по команде с использованием указанной информации
+     *
+     * @param info Информация о команде
+     * @return Справка по команде
+     */
+    public static @NotNull String buildHelpFor(@NotNull CommandInfo info) {
+        List<IPlaceholder> placeholders = new ArrayList<>();
+        placeholders.add(new Placeholder("parent", info.name()));
+
+        StringBuilder output = new StringBuilder();
+        output.append(Utils.parse(String.join("\n", PrimPlugin.i18n
+                .getStringList("commandHelp.header")), placeholders));
+
+        searchSubCommands(info.name()).forEach((name, command) -> {
+            CommandInfo cInfo = command.getInfo();
+
+            List<IPlaceholder> cmdPlaceholders = new ArrayList<>(placeholders);
+            cmdPlaceholders.add(new Placeholder("name", name));
+            cmdPlaceholders.add(new Placeholder("description", cInfo.description()));
+            cmdPlaceholders.add(new Placeholder("aliases", String.join(", ", cInfo.aliases())));
+            cmdPlaceholders.add(new Placeholder("permission", cInfo.permission()));
+            cmdPlaceholders.add(new Placeholder("usage", getUsage(command.getCommand())));
+
+            output.append(Utils.parse(PrimPlugin.i18n.getString("commandHelp.content"), cmdPlaceholders));
+            output.append("\n");
+        });
+
+        output.deleteCharAt(output.length()-1);
+        output.append(Utils.parse(String.join("\n", PrimPlugin.i18n
+                .getStringList("commandHelp.footer")), placeholders));
+
+        return output.toString();
     }
 }

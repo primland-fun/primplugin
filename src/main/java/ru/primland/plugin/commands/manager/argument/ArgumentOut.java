@@ -8,6 +8,7 @@ public record ArgumentOut<T>(int size, @Nullable T output, @Nullable ArgumentErr
         DATABASE_PLAYER_NOT_FOUND,
         INVALID_TYPE_VAR,
         NOT_ENOUGH_ARGUMENTS,
-        FAILED_TO_PARSE_ARGUMENT
+        FAILED_TO_PARSE_ARGUMENT,
+        PLAYER_SELF_SPECIFIED
     }
 }
