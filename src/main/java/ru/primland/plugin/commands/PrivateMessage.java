@@ -40,7 +40,7 @@ public class PrivateMessage extends Command {
      */
     public void load(PrimPlugin plugin) {
         config = Config.load("commands/private_messages.yml");
-        addArgument(new PlayerArgument<PrimPlayer>("receiver", "игрок", true));
+        addArgument(new PlayerArgument<PrimPlayer>("receiver", "игрок", true, true));
         addArgument(new TextArgument("message", "сообщение", true));
     }
 
@@ -63,16 +63,11 @@ public class PrivateMessage extends Command {
         List<IPlaceholder> placeholders = new ArrayList<>();
         placeholders.add(new Placeholder("sender", ctx.sender.getName()));
 
-        // Получаем ник получателя (нам не нужно проверять всё это, т.к. это делается
-        // автоматически)
+        // Получаем объект получателя (нам не нужно проверять всё это, т.к. это
+        // делается автоматически)
         PrimPlayer player = Objects.requireNonNull(ctx.get("receiver"));
         placeholders.add(new Placeholder("player", player));
         placeholders.add(new Placeholder("receiver", player));
-
-        // Проверяем, не указал ли игрок самого себя (с шизой может и в реальность
-        // пообщаться)
-        if(player.getName().equals(ctx.sender.getName()))
-            return Utils.parse(PrimPlugin.i18n.getString("selfSpecified"), placeholders);
 
         Player receiver = Bukkit.getPlayer(player.getName());
 

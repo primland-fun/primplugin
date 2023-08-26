@@ -10,18 +10,17 @@ import ru.primland.plugin.commands.manager.argument.type.PlayerArgument;
 import ru.primland.plugin.database.data.PrimPlayer;
 
 @CommandInfo(
-        name="+",
-        description="Press F to p... Дать другому игроку 1 репутацию",
+        name="-",
+        description="Понизить репутацию другого игрока",
         parent="reputation"
 )
-public class ReputationPlus extends Command {
-    // TODO: calc remaining time and use in error
-
+public class ReputationMinus extends Command {
     /**
      * Загрузить данные команды
      *
      * @param plugin Экземпляр плагина
      */
+    @Override
     public void load(PrimPlugin plugin) {
         addArgument(new PlayerArgument<PrimPlayer>("player", "игрок", true, true));
     }
@@ -31,6 +30,7 @@ public class ReputationPlus extends Command {
      *
      * @param plugin Экземпляр плагина
      */
+    @Override
     public void unload(PrimPlugin plugin) {}
 
     /**
@@ -39,7 +39,8 @@ public class ReputationPlus extends Command {
      * @param ctx Контекст команды
      * @return Сообщение для отправителя команды
      */
+    @Override
     public @Nullable String execute(@NotNull CommandContext ctx) {
-        return ReputationCommand.executeOperation(ctx, "ax", 100, 1, "give");
+        return ReputationCommand.executeOperation(ctx, "in", -100, -1, "take");
     }
 }
