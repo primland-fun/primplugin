@@ -1,6 +1,9 @@
 name: Баг Репорт
 description: Сообщить о каком-либо найденом баге
-labels: Баг
+title: "[Баг] "
+labels: ["Баг"]
+projects: ["primland-fun/1"]
+assignees: ["stngularity"]
 body:
   - type: input
     attributes:
