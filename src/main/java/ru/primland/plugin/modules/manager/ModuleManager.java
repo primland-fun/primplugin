@@ -2,6 +2,7 @@ package ru.primland.plugin.modules.manager;
 
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.utils.Utils;
@@ -40,13 +41,9 @@ public class ModuleManager {
      */
     public static void register(@NotNull Module module) {
         // Получаем и проверяем информацию о команде
-        ModuleInfo info = module.getClass().getAnnotation(ModuleInfo.class);
-        if(info == null) {
-            PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("moduleInfoNotFound"),
-                    new Placeholder("class", module.getClass().getName())));
-
+        ModuleInfo info = getModuleInfo(module);
+        if(info == null)
             return;
-        }
 
         // Регестрируем модуль
         Config config = Config.load(info.config() + ".yml");
@@ -59,6 +56,24 @@ public class ModuleManager {
             PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("enableModule"),
                     new Placeholder("module", info.name())));
         }
+    }
+
+    /**
+     * Получить информацию о модуле
+     *
+     * @param module Объект модуля
+     * @return {@link ModuleInfo}, если найдено, иначе null
+     */
+    public static @Nullable ModuleInfo getModuleInfo(@NotNull Module module) {
+        ModuleInfo info = module.getClass().getAnnotation(ModuleInfo.class);
+        if(info == null) {
+            PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("moduleInfoNotFound"),
+                    new Placeholder("class", module.getClass().getName())));
+
+            return null;
+        }
+
+        return info;
     }
 
     /**
