@@ -18,6 +18,7 @@ permissions:
     children:
       primplugin.commands.primary: true
       primplugin.commands.reload: true
+      primplugin.commands.status: true
       primplugin.commands.rep.set: true
       primplugin.commands.cards.giveBox: true
       primplugin.commands.cards.get: true
@@ -31,6 +32,9 @@ permissions:
 
   primplugin.commands.reload:
     description: "Доступ к команде /prim reload (Перезагрузить плагин)"
+
+  primplugin.commands.status:
+    description: "Доступ к команде /prim status (Состояние плагина)"
 
   primplugin.commands.rep.set:
     description: "Доступ к команде /rep set {игрок} {репутация} (Установить репутацию указанному игроку)"
