@@ -16,6 +16,7 @@
     <!-- Some properties of this plugin -->
     <properties>
         <java.version>17</java.version>
+        <lombok.version>1.18.28</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -99,7 +100,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Lombok API -->
+        <!-- LuckPerms API -->
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
@@ -126,7 +127,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -149,6 +150,15 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    
+                    <!-- Препроцессор Lombok -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 

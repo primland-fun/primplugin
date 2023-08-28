@@ -132,7 +132,7 @@ public class BukkitCommand extends org.bukkit.command.Command {
             GetArgumentContextOutput output = ArgumentContext.getContext(sender, args, original.getArguments(), argument);
             if(output.context() == null)
                 return List.of();
-            
+
             return argument.getSuggests().apply(output.context());
         } catch(IndexOutOfBoundsException error) {
             return List.of();
