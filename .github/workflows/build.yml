@@ -1,0 +1,65 @@
+name: "Сборка проекта"
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Получаем исходники
+        uses: actions/checkout@v3
+        
+      - name: Устанавливаем JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Компилируем в JAR
+        run: mvn clean package
+
+      - name: Получаем версию
+        run: |
+          python3 -c "print('VERSION='+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0]" >> $GITHUB_ENV
+
+      - name: Загружаем в артифакт
+        uses: actions/upload-artifact@v3
+        with:
+          path: "target/PrimPlugin-${{ env.VERSION }}-remapped.jar"
+          name: "primplugin-v${{ env.VERSION }}.jar"
+          if-no-files-found: error
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: [build]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Получаем исходники
+        uses: actions/checkout@v3
+
+      - name: Получаем версию
+        run: |
+          python3 -c "print('VERSION=v'+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0]" >> $GITHUB_ENV
+
+      - name: Скачиваем артифакт
+        uses: actions/download-artifact@v3
+
+      - name: Публикуем на GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG.md
+          tag_name: "${{ env.VERSION }}"
+          name: "PrimPlugin ${{ env.VERSION }}"
+          files: |
+            **/primplugin-*.jar
