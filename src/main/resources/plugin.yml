@@ -17,10 +17,10 @@ commands:
   #  usage: "{игрок} {сообщение...}"
   #  aliases: [w, pm, dm]
 
-  help:
-    description: "Справка по механикам и основным командам сервера"
-    usage: ""
-    aliases: [h]
+  #help:
+  #  description: "Справка по механикам и основным командам сервера"
+  #  usage: ""
+  #  aliases: [h]
 
   reputation:
     description: "Управление репутацией игроков"
