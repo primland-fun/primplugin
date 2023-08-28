@@ -1,68 +1,44 @@
 package ru.primland.plugin.commands.plugin;
 
-import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.commands.manager.Command;
+import ru.primland.plugin.commands.manager.CommandContext;
+import ru.primland.plugin.commands.manager.CommandInfo;
+import ru.primland.plugin.utils.Utils;
 
-import java.util.List;
-
-public class ReloadCommand implements IPluginCommand {
+@CommandInfo(
+        name="reload",
+        description="Перезагрузить весь плагин",
+        parent="primplugin",
+        permission="primplugin.commands.reload"
+)
+public class ReloadCommand extends Command {
     /**
-     * Выполняет команду плагина
-     * @param sender Отправитель команды
-     * @param args Аргументы команды
+     * Загрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
      */
     @Override
-    public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
-        PrimPlugin.getInstance().reload();
-        PrimPlugin.send(sender, PrimPlugin.getInstance().getI18n().getString("reload"));
-    }
+    public void load(PrimPlugin plugin) {}
 
     /**
-     * "Подсказывает" игроку значение аргумента
-     * @param sender Отправитель команды
-     * @param args Аргументы команды
-     * @return Список с подсказками для аргумента
+     * Отгрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
      */
     @Override
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        return List.of();
-    }
+    public void unload(PrimPlugin plugin) {}
 
     /**
-     * Получает и возвращает название этой команды
-     * @return Название команды
+     * Выполнить команду с указанными данными
+     *
+     * @param ctx Контекст команды
+     * @return Сообщение для отправителя команды
      */
     @Override
-    public String getName() {
-        return "reload";
-    }
-
-    /**
-     * Получает и возвращает описание этой команды
-     * @return Описание команды
-     */
-    @Override
-    public String getDescription() {
-        return "Перезагрузить весь плагин";
-    }
-
-    /**
-     * Получает и возвращает разрешения, требуемые для выполнения
-     * этой команды
-     * @return Требуемые разрешения
-     */
-    @Override
-    public List<String> getRequiredPermissions() {
-        return List.of("primplugin.commands.reload");
-    }
-
-    /**
-     * Получает и возвращает инструкцию по использованию этой команды
-     * @return Инструкция по использованию команды
-     */
-    @Override
-    public String getUsage() {
-        return "";
+    public @Nullable String execute(CommandContext ctx) {
+        PrimPlugin.instance.reload();
+        return Utils.parse(PrimPlugin.i18n.getString("reload"));
     }
 }
