@@ -6,7 +6,6 @@ import org.bukkit.inventory.Recipe;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.modules.IPluginModule;
 
 import java.util.ArrayList;
 import java.util.List;

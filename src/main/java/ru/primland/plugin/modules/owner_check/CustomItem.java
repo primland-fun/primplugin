@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.modules.IPluginModule;
 import ru.primland.plugin.utils.Utils;
 
 public class CustomItem implements IPluginModule, Listener {

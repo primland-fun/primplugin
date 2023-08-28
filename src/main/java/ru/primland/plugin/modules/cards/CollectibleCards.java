@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.modules.IPluginModule;
 import ru.primland.plugin.utils.NBTUtils;
 import ru.primland.plugin.utils.Utils;
 
