@@ -9,19 +9,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.commands.manager.CommandManager;
 import ru.primland.plugin.database.MySQLDriver;
-import ru.primland.plugin.modules.IPluginModule;
-import ru.primland.plugin.modules.ModuleManager;
-import ru.primland.plugin.modules.a2border.Achievements2Border;
-import ru.primland.plugin.modules.cards.CollectibleCards;
-import ru.primland.plugin.modules.head_drop.HeadDrop;
 import ru.primland.plugin.modules.jll.JoinLeaveListener;
-import ru.primland.plugin.modules.owner_check.CustomItem;
-import ru.primland.plugin.modules.recipes.CustomRecipes;
+import ru.primland.plugin.modules.manager.ModuleManager;
 import ru.primland.plugin.modules.recipes.GlowEnchantment;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class PrimPlugin extends JavaPlugin {
@@ -29,7 +22,6 @@ public class PrimPlugin extends JavaPlugin {
     public static Config config;
     public static Config i18n;
     public static MySQLDriver driver;
-    public static ModuleManager manager;
     public static LuckPerms lpApi;
 
     private JoinLeaveListener listener;
@@ -51,6 +43,7 @@ public class PrimPlugin extends JavaPlugin {
         // Регистрируем команды плагина
         CommandManager.init();
         CommandManager.registerAll();
+        CommandManager.checkSubCommands();
 
         // Регистрируем JLl
         listener = new JoinLeaveListener();
@@ -60,13 +53,8 @@ public class PrimPlugin extends JavaPlugin {
         GlowEnchantment.register();
 
         // Регистрируем все модули плагин и включаем их
-        manager = new ModuleManager();
-        manager.registerModule(new Achievements2Border());
-        manager.registerModule(new HeadDrop());
-        manager.registerModule(new CustomRecipes());
-        manager.registerModule(new CustomItem());
-        manager.registerModule(new CollectibleCards());
-        manager.enableModules();
+        ModuleManager.init();
+        ModuleManager.registerAll();
     }
 
     public void connectToDatabase() {
@@ -127,9 +115,8 @@ public class PrimPlugin extends JavaPlugin {
         listener.enable(this);
 
         // Перезагружаем модули
-        Collection<IPluginModule> modules = manager.getActiveModules();
-        manager.disableModules();
-        manager.enableModules(modules);
+        ModuleManager.unregisterAll();
+        ModuleManager.registerAll();
 
         // Пишем в консоль о завершении перезагрузки
         send(i18n.getString("reload"));
