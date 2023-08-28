@@ -32,7 +32,7 @@ public class JoinLeaveListener implements Listener {
         MySQLDriver driver = PrimPlugin.getInstance().getDriver();
         if(!driver.isNotWorking() && !driver.playerExists(player.getName())) {
             driver.addPlayer(player);
-            GiveBoxCommand.giveBox(player, 2, Config.load("modules/cards.yml"));
+            GiveBoxCommand.giveBox(player, 2, Config.load("cards.yml"));
         }
 
         messages(player);

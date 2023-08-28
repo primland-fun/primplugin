@@ -333,7 +333,7 @@ public class CollectibleCards implements IPluginModule, Listener {
     @Override
     public void enable(@NotNull PrimPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        config = Config.load("modules/cards.yml");
+        config = Config.load("cards.yml");
 
         // Получаем сигнатуры
         this.boxSignature = NBTUtils.getSignature(config.getString("box.signature", "prp_type=cards_box"));
