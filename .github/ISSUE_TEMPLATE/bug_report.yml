@@ -5,7 +5,7 @@ labels: ["Баг"]
 projects: ["primland-fun/1"]
 assignees: ["stngularity"]
 body:
-- type: input
+- type: textarea
   attributes:
     label: Проблема
     description: Полное и чёткое описание проблемы
