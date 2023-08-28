@@ -1,0 +1,27 @@
+name: Предложение
+description: Предложить добавить какую-либо команду/механику/функцию/т.д.
+title: "[Предложение] "
+labels: ["Предложение"]
+projects: ["primland-fun/1"]
+assignees: ["stngularity"]
+body:
+- type: textarea
+  attributes:
+    label: Суть идеи
+    description: Полное и чёткое описание идеи
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Смысл
+    description: Опишите здесь, зачем нужна эта механика/команда/функция/т.д.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Примерная реализация
+    description: Если вы знаете как примерно реализовать свою идею, то напишите здесь
+- type: textarea
+  attributes:
+    label: Доп. информация
+    description: Можете написать здесь что-нибудь ещё, если хотите
