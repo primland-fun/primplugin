@@ -10,8 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+/**
+ * Менеджер модулей
+ */
 public class ModuleManager {
-    public static Map<String, CachedModule> cache;
+    private static Map<String, CachedModule> cache;
 
     /**
      * Инициализировать менеджер.
