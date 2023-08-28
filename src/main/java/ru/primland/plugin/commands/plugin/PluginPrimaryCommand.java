@@ -1,107 +1,43 @@
 package ru.primland.plugin.commands.plugin;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
-import org.jetbrains.annotations.NotNull;
+
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.commands.manager.Command;
+import ru.primland.plugin.commands.manager.CommandContext;
+import ru.primland.plugin.commands.manager.CommandInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-public class PluginPrimaryCommand implements TabExecutor {
-    private final List<IPluginCommand> commands = new ArrayList<>();
-
+@CommandInfo(
+        name="primplugin",
+        description="Основная команда плагина PrimPlugin",
+        permission="primplugin.command.primary",
+        aliases={"prim", "pp"}
+)
+public class PluginPrimaryCommand extends Command {
+    /**
+     * Загрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(!sender.hasPermission("primplugin.commands.primary")) {
-            PrimPlugin.send(sender, "&cИзвините, но у Вас недостаточно прав для выполнения этой команды");
-            return true;
-        }
+    public void load(PrimPlugin plugin) {}
 
-        if(args.length == 0)
-            return onCommand(sender, command, label, List.of("help").toArray(new String[0]));
-
-        for(IPluginCommand cmd : commands) {
-            if(!cmd.getName().equals(args[0]))
-                continue;
-
-            for(String permission : cmd.getRequiredPermissions()) {
-                if(sender.hasPermission(permission))
-                    continue;
-
-                PrimPlugin.send(sender, "&cИзвините, но у Вас недостаточно прав для выполнения этой команды");
-                return true;
-            }
-
-            List<String> cArgs = new ArrayList<>(List.of(args));
-            cArgs.remove(0);
-            cmd.execute(sender, cArgs);
-            return true;
-        }
-
-        PrimPlugin.send(sender, "&cИзвините, но данная команда не найдена");
-        return true;
-    }
-
-    @Nullable
+    /**
+     * Отгрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-        int argNumber = Math.max(args.length-1, 0);
-        if(argNumber == 0) {
-            List<String> names = new ArrayList<>();
-            for(IPluginCommand cmd : commands) {
-                if(hasNotPermissions(sender, cmd.getRequiredPermissions())) continue;
-                names.add(cmd.getName());
-            }
+    public void unload(PrimPlugin plugin) {}
 
-            return names;
-        }
-
-        for(IPluginCommand cmd : commands) {
-            if(!cmd.getName().equals(args[0])) continue;
-            return cmd.tabComplete(sender, args);
-        }
-
-        return null;
-    }
-
-    public static boolean hasNotPermissions(CommandSender sender, @NotNull List<String> permissions) {
-        for(String permission : permissions) {
-            if(sender.hasPermission(permission)) continue;
-            return true;
-        }
-
-        return false;
-    }
-
-    public void addCommand(IPluginCommand command) {
-        this.commands.add(command);
-    }
-
-    public void removeCommand(String name) {
-        int index = -1;
-        for(IPluginCommand cmd : this.commands) {
-            if(name.equals(cmd.getName())) break;
-            index++;
-        }
-
-        if(index >= 0 && Objects.equals(this.commands.get(index).getName(), name))
-            this.commands.remove(index);
-    }
-
-    public List<IPluginCommand> getCommands() {
-        return commands;
-    }
-
-    public boolean hasCommand(String commandName) {
-        for(IPluginCommand command : commands) {
-            if(!command.getName().equals(commandName)) continue;
-            return true;
-        }
-
-        return false;
+    /**
+     * Выполнить команду с указанными данными
+     *
+     * @param ctx Контекст команды
+     * @return Сообщение для отправителя команды
+     */
+    @Override
+    public @Nullable String execute(CommandContext ctx) {
+        return HelpCommand.getResult(ctx, 1);
     }
 }
