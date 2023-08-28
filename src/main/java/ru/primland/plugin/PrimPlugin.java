@@ -3,16 +3,11 @@ package ru.primland.plugin;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.commands.manager.CommandManager;
-import ru.primland.plugin.commands.plugin.HelpCommand;
-import ru.primland.plugin.commands.plugin.InfoCommand;
-import ru.primland.plugin.commands.plugin.PluginPrimaryCommand;
-import ru.primland.plugin.commands.plugin.ReloadCommand;
 import ru.primland.plugin.database.MySQLDriver;
 import ru.primland.plugin.modules.IPluginModule;
 import ru.primland.plugin.modules.ModuleManager;
@@ -34,7 +29,6 @@ public class PrimPlugin extends JavaPlugin {
     public static Config config;
     public static Config i18n;
     public static MySQLDriver driver;
-    public static PluginPrimaryCommand command;
     public static ModuleManager manager;
     public static LuckPerms lpApi;
 
@@ -57,22 +51,6 @@ public class PrimPlugin extends JavaPlugin {
         // Регистрируем команды плагина
         CommandManager.init();
         CommandManager.registerAll();
-
-        // Регистрируем команду плагина
-        command = new PluginPrimaryCommand();
-        command.addCommand(new HelpCommand());
-        command.addCommand(new InfoCommand());
-        command.addCommand(new ReloadCommand());
-
-        PluginCommand pluginCommand = getCommand("primplugin");
-        if(pluginCommand == null) {
-            send(i18n.getString("registerError"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        pluginCommand.setExecutor(command);
-        pluginCommand.setTabCompleter(command);
 
         // Регистрируем JLl
         listener = new JoinLeaveListener();
@@ -153,7 +131,7 @@ public class PrimPlugin extends JavaPlugin {
         manager.disableModules();
         manager.enableModules(modules);
 
-        // Отправляем сообщение
+        // Пишем в консоль о завершении перезагрузки
         send(i18n.getString("reload"));
     }
 }
