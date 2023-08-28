@@ -5,34 +5,31 @@ labels: ["Баг"]
 projects: ["primland-fun/1"]
 assignees: ["stngularity"]
 body:
-  - type: input
-    attributes:
-      label: Проблема
-      description: Полное и чёткое описание проблемы
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: Шаги для вызова ошибки
-      description: >
-         Опишите ВСЕ шаги, которые требуются для получения этой ошибки
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: Ожидаемый результат
-      description: >
-        Какой результат ожидается при выполнении ранее описанных шагов
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: Реальный результат
-      description: >
-        Что происходит на самом деле
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: Доп. информация
-      description: Можете написать здесь что-нибудь ещё, если хотите
+- type: input
+  attributes:
+    label: Проблема
+    description: Полное и чёткое описание проблемы
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Шаги для вызова ошибки
+    description: Опишите ВСЕ шаги, которые требуются для получения этой ошибки
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Ожидаемый результат
+    description: Какой результат ожидается при выполнении ранее описанных шагов
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Реальный результат
+    description: Что происходит на самом деле
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Доп. информация
+    description: Можете написать здесь что-нибудь ещё, если хотите
