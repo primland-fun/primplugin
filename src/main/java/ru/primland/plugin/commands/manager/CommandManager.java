@@ -2,6 +2,7 @@ package ru.primland.plugin.commands.manager;
 
 import io.github.stngularity.epsilon.engine.placeholders.IPlaceholder;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.SimplePluginManager;
@@ -17,6 +18,7 @@ import java.util.*;
 /**
  * Менеджер команд
  */
+@Getter
 public class CommandManager {
     private static Map<String, CachedCommand> cache;
     private static CommandMap commandMap;
