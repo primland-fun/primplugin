@@ -8,14 +8,11 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.primland.plugin.commands.*;
 import ru.primland.plugin.commands.manager.CommandManager;
 import ru.primland.plugin.commands.plugin.HelpCommand;
 import ru.primland.plugin.commands.plugin.InfoCommand;
 import ru.primland.plugin.commands.plugin.PluginPrimaryCommand;
 import ru.primland.plugin.commands.plugin.ReloadCommand;
-import ru.primland.plugin.commands.reputation.ReputationCommand;
-import ru.primland.plugin.commands.whitelist.WhitelistCommand;
 import ru.primland.plugin.database.MySQLDriver;
 import ru.primland.plugin.modules.IPluginModule;
 import ru.primland.plugin.modules.ModuleManager;
@@ -39,12 +36,7 @@ public class PrimPlugin extends JavaPlugin {
     public static MySQLDriver driver;
     public static PluginPrimaryCommand command;
     public static ModuleManager manager;
-    public static WhitelistCommand whitelistCommand;
     public static LuckPerms lpApi;
-
-    private PrivateMessage privateMessageCommand;
-    private MCHelpCommand helpCommand;
-    private ReputationCommand repCommand;
 
     private JoinLeaveListener listener;
 
@@ -98,20 +90,8 @@ public class PrimPlugin extends JavaPlugin {
         manager.registerModule(new CollectibleCards());
         manager.enableModules();
 
-        // Регистрируем команду `/msg`
-        //privateMessageCommand = new PrivateMessage(Config.load("commands/private_messages.yml"));
-        //PluginCommand msgCommand = getCommand("msg");
-        //if(msgCommand == null) {
-        //    send(i18n.getString("registerError"));
-        //    getServer().getPluginManager().disablePlugin(this);
-        //    return;
-        //}
-
-        //msgCommand.setExecutor(privateMessageCommand);
-        //msgCommand.setTabCompleter(privateMessageCommand);
-
         // Регистрируем команду `/help`
-        helpCommand = new MCHelpCommand(Config.load("commands/minecraft_help.yml"));
+        /*helpCommand = new MCHelpCommand(Config.load("commands/minecraft_help.yml"));
         PluginCommand mcHelpCommand = getCommand("help");
         if(mcHelpCommand == null) {
             send(i18n.getString("registerError"));
@@ -119,29 +99,7 @@ public class PrimPlugin extends JavaPlugin {
             return;
         }
 
-        mcHelpCommand.setExecutor(helpCommand);
-
-        // Регистрируем команду `/rep`
-        repCommand = new ReputationCommand(Config.load("reputation.yml"));
-        PluginCommand mcRepCommand = getCommand("reputation");
-        if(mcRepCommand == null) {
-            send(i18n.getString("registerError"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        mcRepCommand.setExecutor(repCommand);
-
-        // Регистрируем команду `/plwl`
-        //whitelistCommand = new WhitelistCommand(Config.load("commands/whitelist.yml"));
-        //PluginCommand mcWlCommand = getCommand("plwl");
-        //if(mcWlCommand == null) {
-        //    send(i18n.getString("registerError"));
-        //    getServer().getPluginManager().disablePlugin(this);
-        //    return;
-        //}
-
-        //mcWlCommand.setExecutor(whitelistCommand);
+        mcHelpCommand.setExecutor(helpCommand);*/
     }
 
     public void connectToDatabase() {
@@ -189,10 +147,7 @@ public class PrimPlugin extends JavaPlugin {
         config.reload();
         i18n.reload();
 
-        //privateMessageCommand.updateConfig(Config.load("commands/private_messages.yml"));
-        helpCommand.updateConfig(Config.load("commands/minecraft_help.yml"));
-        repCommand.updateConfig(Config.load("reputation.yml"));
-        //whitelistCommand.reload();
+        //helpCommand.updateConfig(Config.load("commands/minecraft_help.yml"));
 
         // Заново подключаемся к базе данных
         driver.disconnect();
