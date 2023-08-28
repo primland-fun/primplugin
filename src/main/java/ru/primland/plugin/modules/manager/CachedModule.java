@@ -4,16 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 
 @Getter @Setter @AllArgsConstructor
 public class CachedModule {
     // Объект модуля
-    @NotNull Module module;
+    private @NotNull Module module;
 
     // Информация о модуле
-    @NotNull ModuleInfo info;
+    private @NotNull ModuleInfo info;
 
     // Конфигурация модуля
-    @NotNull Config config;
+    private @Nullable Config config;
 }
