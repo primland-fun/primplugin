@@ -89,17 +89,6 @@ public class PrimPlugin extends JavaPlugin {
         manager.registerModule(new CustomItem());
         manager.registerModule(new CollectibleCards());
         manager.enableModules();
-
-        // Регистрируем команду `/help`
-        /*helpCommand = new MCHelpCommand(Config.load("commands/minecraft_help.yml"));
-        PluginCommand mcHelpCommand = getCommand("help");
-        if(mcHelpCommand == null) {
-            send(i18n.getString("registerError"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        mcHelpCommand.setExecutor(helpCommand);*/
     }
 
     public void connectToDatabase() {
@@ -146,8 +135,6 @@ public class PrimPlugin extends JavaPlugin {
         // Перезагружаем конфиги
         config.reload();
         i18n.reload();
-
-        //helpCommand.updateConfig(Config.load("commands/minecraft_help.yml"));
 
         // Заново подключаемся к базе данных
         driver.disconnect();
