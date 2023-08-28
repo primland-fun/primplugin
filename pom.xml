@@ -4,25 +4,25 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- The primary information about project -->
+    <!-- Основная информация о проекте -->
     <groupId>ru.primland</groupId>
     <artifactId>PrimPlugin</artifactId>
     <version>2.0.0</version>
 
     <name>PrimPlugin</name>
-    <description>The main plugin of PrimLand</description>
+    <description>Основной плагин проекта PrimLand</description>
     <url>https://github.com/primland-fun/primplugin</url>
 
-    <!-- Some properties of this plugin -->
+    <!-- Свойства проекта -->
     <properties>
         <java.version>17</java.version>
         <lombok.version>1.18.28</lombok.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- All repositories for dependencies -->
+    <!-- Список всех репозиториев для зависимостей -->
     <repositories>
-        <!-- SpigotMC Repositories -->
+        <!-- Репозитории SpigotMC -->
         <repository>
             <id>spigot-repo</id>
             <name>SpigotMC Repository</name>
@@ -35,7 +35,7 @@
             <url>https://repo.codemc.io/repository/nms</url>
         </repository>
 
-        <!-- Mojang Repository -->
+        <!-- Репозиторий Mojang -->
         <repository>
             <id>minecraft-repo</id>
             <name>Mojang Repository</name>
@@ -50,9 +50,9 @@
         </repository>
     </repositories>
 
-    <!-- Dependencies of given project -->
+    <!-- Зависимости проекта -->
     <dependencies>
-        <!-- Epsilon Engine, for expressions -->
+        <!-- Epsilon Engine, для выражений -->
         <dependency>
             <groupId>io.github.stngularity.epsilon</groupId>
             <artifactId>engine</artifactId>
@@ -108,7 +108,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- MySQL Driver -->
+        <!-- Драйвер MySQL для JDBC -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -116,14 +116,14 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- For math -->
+        <!-- Exp4j, для математических формул -->
         <dependency>
             <groupId>net.objecthunter</groupId>
             <artifactId>exp4j</artifactId>
             <version>0.4.8</version>
         </dependency>
 
-        <!-- Lombok, very useful annotations -->
+        <!-- Lombok, очень полезные аннотации -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -131,7 +131,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Annotations -->
+        <!-- JetBrains Annotations, аннотации -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -140,7 +140,7 @@
         </dependency>
     </dependencies>
 
-    <!-- Build settings -->
+    <!-- Настройки сборки -->
     <build>
         <plugins>
             <plugin>
@@ -150,7 +150,7 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    
+
                     <!-- Препроцессор Lombok -->
                     <annotationProcessorPaths>
                         <path>
