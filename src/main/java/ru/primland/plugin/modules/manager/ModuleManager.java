@@ -55,6 +55,7 @@ public class ModuleManager {
         // Включаем модуль, если это требуется
         if(config.getBoolean("enabled", false)) {
             module.load(PrimPlugin.instance);
+            module.enabled = true;
             PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("enableModule"),
                     new Placeholder("module", info.name())));
         }
@@ -71,6 +72,7 @@ public class ModuleManager {
             return;
 
         module.getModule().unload(PrimPlugin.instance);
+        module.getModule().enabled = false;
         module.setConfig(null);
 
         PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("disableModule"), new Placeholder("module", name)));
@@ -87,6 +89,7 @@ public class ModuleManager {
             return;
 
         module.getModule().load(PrimPlugin.instance);
+        module.getModule().enabled = true;
         module.setConfig(Config.load(module.getInfo().config() + ".yml"));
 
         PrimPlugin.send(Utils.parse(PrimPlugin.i18n.getString("enableModule"), new Placeholder("module", name)));
