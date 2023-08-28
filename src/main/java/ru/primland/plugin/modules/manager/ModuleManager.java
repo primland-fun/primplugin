@@ -14,7 +14,7 @@ import java.util.ServiceLoader;
  * Менеджер модулей
  */
 public class ModuleManager {
-    private static Map<String, CachedModule> cache;
+    public static Map<String, CachedModule> cache;
 
     /**
      * Инициализировать менеджер.
