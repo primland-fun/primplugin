@@ -22,10 +22,10 @@ commands:
   #  usage: ""
   #  aliases: [h]
 
-  reputation:
-    description: "Управление репутацией игроков"
-    usage: "{действие} {игрок} [доп.аргументы...]"
-    aliases: [rep, r]
+  #reputation:
+  #  description: "Управление репутацией игроков"
+  #  usage: "{действие} {игрок} [доп.аргументы...]"
+  #  aliases: [rep, r]
 
   #plwl:
   #  description: "Команда для управления белым списком"
