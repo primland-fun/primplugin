@@ -5,12 +5,12 @@ authors: [stngularity]
 api-version: 1.19
 main: ru.primland.plugin.PrimPlugin
 
-commands:
-  primplugin:
-    description: "Основная команда плагина PrimPlugin"
-    usage: "{команда} [аргументы...]"
-    aliases: [prim, pp]
-    permission: "primplugin.admin"
+#commands:
+  #primplugin:
+  #  description: "Основная команда плагина PrimPlugin"
+  #  usage: "{команда} [аргументы...]"
+  #  aliases: [prim, pp]
+  #  permission: "primplugin.command.primary"
 
   #msg:
   #  description: "Отправить приватное сообщение любому игроку"
