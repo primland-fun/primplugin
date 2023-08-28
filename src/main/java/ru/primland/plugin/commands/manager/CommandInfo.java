@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * Это замена полной реализации команд на аннотациях, т.к. я ещё не настолько умён
  * для этого
  */
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CommandInfo {
     // Название команды
