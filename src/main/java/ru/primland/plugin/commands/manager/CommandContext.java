@@ -12,6 +12,7 @@ import ru.primland.plugin.commands.manager.argument.ArgumentContext;
 import ru.primland.plugin.commands.manager.argument.ArgumentOut;
 import ru.primland.plugin.commands.manager.argument.GetArgumentContextOutput;
 import ru.primland.plugin.commands.manager.argument.type.Argument;
+import ru.primland.plugin.utils.CustomMenu;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.ArrayList;
@@ -73,6 +74,15 @@ public class CommandContext {
     public void send(String text, List<IPlaceholder> placeholders) {
         if(text == null) return;
         sender.sendMessage(Utils.parse(text, placeholders));
+    }
+
+    /**
+     * Открыть указанное меню у отправителя команды
+     *
+     * @param menu Объект меню
+     */
+    public void open(@NotNull CustomMenu menu) {
+        menu.open(sender);
     }
 
     /**
