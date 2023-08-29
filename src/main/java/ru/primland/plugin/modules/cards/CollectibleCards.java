@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.modules.manager.Module;
+import ru.primland.plugin.modules.manager.ModuleInfo;
 import ru.primland.plugin.utils.NBTUtils;
 import ru.primland.plugin.utils.Utils;
 
@@ -31,12 +33,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CollectibleCards implements IPluginModule, Listener {
+@ModuleInfo(name="cards", config="cards", description="Коллекционные карточки")
+public class CollectibleCards extends Module implements Listener {
+    // TODO: Переписать... полностью
+    
     private final static Pattern actionPattern = Pattern.compile("\\[([a-zA-Z0-9_]+)] *(.*)?");
 
-    private boolean enabled;
-    private Config config;
-
+    public static Config config;
     private List<String> boxSignature;
     private List<String> cardSignature;
     private List<Map<?, ?>> cards;
@@ -44,6 +47,58 @@ public class CollectibleCards implements IPluginModule, Listener {
 
     private List<String> players;
 
+    /**
+     * Загрузить (включить) модуль
+     *
+     * @param plugin Экземпляр плагина
+     */
+    @Override
+    public void load(PrimPlugin plugin) {
+        config = getConfig();
+        if(config == null)
+            return;
+
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+
+        // Получаем сигнатуры
+        this.boxSignature = NBTUtils.getSignature(config.getString("box.signature", "prp_type=cards_box"));
+        this.cardSignature = NBTUtils.getSignature(config.getString("cards.signature", "prp_type=card:{rarity}:{id}"));
+
+        // Получаем список карточек
+        this.cards = config.getMapList("cards.list");
+
+        // Получаем список редкостей
+        this.rarities = new HashMap<>();
+        config.getMapList("rarityList").forEach(rarity -> rarities.put(((String) rarity.get("id")), rarity));
+
+        // Инициализируем список игроков
+        this.players = new ArrayList<>();
+    }
+
+    /**
+     * Отгрузить (выключить) модуль
+     *
+     * @param plugin Экземпляр плагина
+     */
+    @Override
+    public void unload(PrimPlugin plugin) {
+        InventoryClickEvent.getHandlerList().unregister(this);
+        InventoryDragEvent.getHandlerList().unregister(this);
+        PlayerSwapHandItemsEvent.getHandlerList().unregister(this);
+        CraftItemEvent.getHandlerList().unregister(this);
+        BlockPlaceEvent.getHandlerList().unregister(this);
+        PlayerInteractEvent.getHandlerList().unregister(this);
+        PlayerDropItemEvent.getHandlerList().unregister(this);
+    }
+
+    /**
+     * Обработать событие... связанное с предметами?
+     *
+     * @param item   Объект предмета
+     * @param player Объект игрока
+     * @param event  Объект события
+     * @param error  Ключ локализации ошибки
+     */
     private void handleItemEvent(ItemStack item, Player player, Cancellable event, String error) {
         Material material = Material.valueOf(config.getString("box.material", "ENCHANTED_BOOK"));
         if(item == null || !item.getType().equals(material) || NBTUtils.isInvalidSignature(this.boxSignature, item))
@@ -155,7 +210,7 @@ public class CollectibleCards implements IPluginModule, Listener {
 
         players.add(player.getName());
 
-        Bukkit.getScheduler().runTaskAsynchronously(PrimPlugin.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(PrimPlugin.instance, () -> {
             config.getStringList("box.preOpenAction").forEach(poAction -> {
                 Matcher matcher = actionPattern.matcher(poAction);
                 if(!matcher.matches())
@@ -202,7 +257,6 @@ public class CollectibleCards implements IPluginModule, Listener {
             }
 
             item.setAmount(item.getAmount()-1);
-            //player.getInventory().getItem(event.getHand()).setAmount(item.getAmount()-1);
             players.remove(player.getName());
 
             giveCards.forEach(card -> {
@@ -219,6 +273,10 @@ public class CollectibleCards implements IPluginModule, Listener {
         });
     }
 
+    /**
+     * Выбрать и получить информацию об 1 рандомной карточке
+     * @return Карта с ключами карточки
+     */
     public Map<?, ?> getOneCard() {
         AtomicReference<Map<?, ?>> output = new AtomicReference<>(null);
         this.rarities.forEach((id, rarity) -> {
@@ -236,7 +294,7 @@ public class CollectibleCards implements IPluginModule, Listener {
                 aCards.add(card);
             });
 
-            if(aCards.size() == 0)
+            if(aCards.isEmpty())
                 return;
 
             output.set(aCards.get(Utils.randomInt(0, aCards.size()-1)));
@@ -245,15 +303,24 @@ public class CollectibleCards implements IPluginModule, Listener {
         return output.get() == null ? getOneCard() : output.get();
     }
 
-    public static @Nullable ItemStack getCard(@NotNull Config config, Map<?, ?> rarity, Map<?, ?> card) {
+    /**
+     * Получить карточку как предмет
+     *
+     * @param rarity Информация об редкости карточки
+     * @param card   Информация об самой карточке
+     * @return {@link ItemStack}, если всё прошло успешно, иначе null
+     */
+    public static @Nullable ItemStack getCard(Map<?, ?> rarity, Map<?, ?> card) {
         ItemStack item = new ItemStack(Material.valueOf(config.getString("cards.material", "PAPER")));
         ItemMeta meta = item.getItemMeta();
         if(meta == null) return null;
 
-        Placeholder[] placeholders = {new Placeholder("name", card.get("name")),
+        Placeholder[] placeholders = {
+                new Placeholder("name", card.get("name")),
                 new Placeholder("id", card.get("id")),
                 new Placeholder("rarity.color", rarity.get("color")),
-                new Placeholder("rarity.name", rarity.get("name"))};
+                new Placeholder("rarity.name", rarity.get("name"))
+        };
 
         meta.setDisplayName(Utils.parse(config.getString("cards.format.displayName"), placeholders));
 
@@ -287,109 +354,18 @@ public class CollectibleCards implements IPluginModule, Listener {
         return CraftItemStack.asBukkitCopy(nmsItem);
     }
 
+    /**
+     * Получить рандомную карточку
+     * @return Карта, где ключ - это сырая информация о карточке, а значение - предмет
+     */
     public Map<Map<?, ?>, ItemStack> randomCard() {
         Map<?, ?> card = getOneCard();
         Map<?, ?> rarity = rarities.get((String) card.get("rarity"));
 
-        ItemStack item = getCard(config, rarity, card);
+        ItemStack item = getCard(rarity, card);
         if(item == null)
             return null;
 
         return Map.of(card, item);
-    }
-
-    /**
-     * Получает и возвращает название данного модуля
-     * @return Название модуля
-     */
-    @Override
-    public String getName() {
-        return "cards";
-    }
-
-    /**
-     * Получает и возвращает название конфигурации данного модуля
-     * @return Название модуля
-     */
-    @Override
-    public String getConfigName() {
-        return "cards.yml";
-    }
-
-    /**
-     * Получает и возвращает описание этого модуля
-     * @return Описание модуля
-     */
-    @Override
-    public String getDescription() {
-        return "Коллекционные карточки и их логика";
-    }
-
-    /**
-     * Включает данный модуль
-     * @param plugin Объект PrimPlugin
-     */
-    @Override
-    public void enable(@NotNull PrimPlugin plugin) {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        config = Config.load("cards.yml");
-
-        // Получаем сигнатуры
-        this.boxSignature = NBTUtils.getSignature(config.getString("box.signature", "prp_type=cards_box"));
-        this.cardSignature = NBTUtils.getSignature(config.getString("cards.signature", "prp_type=card:{rarity}:{id}"));
-
-        // Получаем список карточек
-        this.cards = config.getMapList("cards.list");
-
-        // Получаем список редкостей
-        this.rarities = new HashMap<>();
-        config.getMapList("rarityList").forEach(rarity ->
-                rarities.put(((String) rarity.get("id")), rarity));
-
-        // Инициализируем список игроков
-        this.players = new ArrayList<>();
-
-        // Регистрируем команды
-        plugin.getManager().registerCommandFor(getName(), new GiveBoxCommand(config));
-        plugin.getManager().registerCommandFor(getName(), new GetCardCommand(config));
-
-        // Маркируем модуль как включённый
-        enabled = true;
-    }
-
-    /**
-     * Выключает этот модуль
-     * @param plugin Объект PrimPlugin
-     */
-    @Override
-    public void disable(PrimPlugin plugin) {
-        enabled = false;
-
-        // Убираем листенер событий
-        InventoryClickEvent.getHandlerList().unregister(this);
-        InventoryDragEvent.getHandlerList().unregister(this);
-        PlayerSwapHandItemsEvent.getHandlerList().unregister(this);
-        CraftItemEvent.getHandlerList().unregister(this);
-        BlockPlaceEvent.getHandlerList().unregister(this);
-        PlayerInteractEvent.getHandlerList().unregister(this);
-        PlayerDropItemEvent.getHandlerList().unregister(this);
-    }
-
-    /**
-     * Включён ли модуль
-     * @return Ответ на данный выше вопрос
-     */
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * Немного информации о модуле плагина и его состоянии
-     * @return Информация о модуле
-     */
-    @Override
-    public String information() {
-        return null;
     }
 }

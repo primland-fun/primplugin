@@ -20,8 +20,8 @@ permissions:
       primplugin.commands.reload: true
       primplugin.commands.status: true
       primplugin.commands.rep.set: true
-      primplugin.commands.cards.giveBox: true
-      primplugin.commands.cards.get: true
+      primplugin.commands.cards.give_box: true
+      primplugin.commands.cards.give_card: true
       primplugin.commands.headDrop.getHead: true
       primplugin.commands.whitelist.add: true
       primplugin.commands.whitelist.remove: true
@@ -31,19 +31,26 @@ permissions:
     description: "Доступ к основной (!) команде PrimPlugin"
 
   primplugin.commands.reload:
-    description: "Доступ к команде /prim reload (Перезагрузить плагин)"
+    description: "Доступ к команде /prim reload"
 
   primplugin.commands.status:
-    description: "Доступ к команде /prim status (Состояние плагина)"
+    description: "Доступ к команде /prim status"
 
   primplugin.commands.rep.set:
-    description: "Доступ к команде /rep set {игрок} {репутация} (Установить репутацию указанному игроку)"
+    description: "Доступ к команде /rep set {игрок} {репутация}"
 
-  primplugin.commands.cards.giveBox:
-    description: "Доступ к команде /prim cards give-box {игрок} [количество] (Выдать ящики с карточками)"
+  primplugin.commands.cards.primary:
+    description: "Доступ к команде /cards"
 
-  primplugin.commands.cards.get:
-    description: "Доступ к команде /prim cards get {редкость} {ID карточки} (Получить карточку)"
+  primplugin.commands.cards.give_box:
+    description: "Доступ к команде /cards give-box [игрок] [количество]"
+    children:
+      primplugin.commands.cards.primary: true
+
+  primplugin.commands.cards.give_card:
+    description: "Доступ к команде /cards give-card {редкость} {ID карточки} [игрок]"
+    children:
+      primplugin.commands.cards.primary: true
 
   primplugin.commands.headDrop.getHead:
     description: "Доступ к команде /prim heads get {игрок} (Получить голову указанного игрока)"

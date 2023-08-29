@@ -2,9 +2,7 @@ package ru.primland.plugin.modules.cards;
 
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import net.minecraft.nbt.StringTag;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.plugin.IPluginCommand;
+import ru.primland.plugin.commands.manager.Command;
+import ru.primland.plugin.commands.manager.CommandContext;
+import ru.primland.plugin.commands.manager.CommandInfo;
+import ru.primland.plugin.commands.manager.argument.type.IntegerArgument;
+import ru.primland.plugin.commands.manager.argument.type.PlayerArgument;
 import ru.primland.plugin.utils.NBTUtils;
 import ru.primland.plugin.utils.Utils;
 
@@ -21,52 +23,79 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GiveBoxCommand implements IPluginCommand {
-    private final Config config;
+@CommandInfo(
+        name="give-box",
+        description="Выдать указанному игроку коробки с карточками",
+        permission="primplugin.commands.cards.give_box",
+        parent="cards"
+)
+public class GiveBoxCommand extends Command {
+    private Config config;
 
-    public GiveBoxCommand(Config cardsConfig) {
-        this.config = cardsConfig;
-    }
-
+    /**
+     * Загрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
     @Override
-    public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
-        if(args.size() == 0) {
-            PrimPlugin.send(sender, Utils.translate(config.getString("box.commandErrors.specifyPlayer")));
-            return;
-        }
-
-        Player player = Bukkit.getPlayer(args.get(0));
-        if(player == null) {
-            PrimPlugin.send(sender, Utils.parse(config.getString("box.commandErrors.playerNotFound"),
-                    new Placeholder("name", args.get(0))));
-            return;
-        }
-
-        int amount = 1;
-        if(args.size() >= 2)
-            amount = Integer.parseInt(args.get(1));
-
-        giveBox(player, amount, config);
-        PrimPlugin.send(sender, Utils.parse(config.getString("box.commandDone"),
-                new Placeholder("player", player.getName())));
+    public void load(PrimPlugin plugin) {
+        config = CollectibleCards.config;
+        addArgument(new PlayerArgument<Player>("player", "игрок", false, false));
+        addArgument(new IntegerArgument("amount", "количество", false));
     }
 
-    public static @Nullable ItemStack getBox(@NotNull Config config, int amount) {
-        Material material = Material.valueOf(config.getString("box.material", "ENCHANTED_BOOK"));
+    /**
+     * Отгрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
+    @Override
+    public void unload(PrimPlugin plugin) {
+        config = null;
+    }
+
+    /**
+     * Выполнить команду с указанными данными
+     *
+     * @param ctx Контекст команды
+     * @return Сообщение для отправителя команды
+     */
+    @Override
+    public @Nullable String execute(@NotNull CommandContext ctx) {
+        Player player = ctx.get("player");
+        if(player == null)
+            player = ctx.sender;
+
+        Integer ctxAmount = ctx.get("amount");
+        int amount = ctxAmount == null ? 1 : ctxAmount;
+
+        giveBox(player, amount);
+        return Utils.parse(config.getString("box.commandDone"), new Placeholder("player", player.getName()));
+    }
+
+    /**
+     * Получить коробку с карточками в качестве предмета
+     *
+     * @param amount Количество коробок
+     * @return {@link ItemStack}
+     */
+    public static @NotNull ItemStack getBox(int amount) {
+        Material material = Material.valueOf(CollectibleCards.config.getString("box.material", "ENCHANTED_BOOK"));
         ItemStack item = new ItemStack(material, Math.min(amount, material.getMaxStackSize()));
 
         ItemMeta meta = item.getItemMeta();
-        if(meta == null) return null;
-        meta.setDisplayName(Utils.translate(config.getString("box.displayName")));
+        if(meta != null) {
+            meta.setDisplayName(Utils.translate(CollectibleCards.config.getString("box.displayName")));
 
-        List<String> lore = new ArrayList<>();
-        config.getStringList("box.lore").forEach(line -> lore.add(Utils.translate(line)));
-        meta.setLore(lore);
+            List<String> lore = new ArrayList<>();
+            CollectibleCards.config.getStringList("box.lore").forEach(line -> lore.add(Utils.translate(line)));
+            meta.setLore(lore);
 
-        item.setItemMeta(meta);
+            item.setItemMeta(meta);
+        }
 
-        List<String> signature = NBTUtils.getSignature(config.getString("box.signature", "prp_type=cards_box"));
-        if(signature == null) return null;
+        List<String> signature = NBTUtils.getSignature(CollectibleCards.config.getString("box.signature", "prp_type=cards_box"));
+        if(signature == null) return item;
 
         net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
         nmsItem.addTagElement(signature.get(0), StringTag.valueOf(signature.get(1)));
@@ -74,10 +103,14 @@ public class GiveBoxCommand implements IPluginCommand {
         return item;
     }
 
-    public static void giveBox(Player player, int amount, @NotNull Config config) {
-        ItemStack item = getBox(config, amount);
-        if(item == null) return;
-
+    /**
+     * Выдать игроку коробку с карточками
+     *
+     * @param player Объект игрока
+     * @param amount Количество коробок
+     */
+    public static void giveBox(Player player, int amount) {
+        ItemStack item = getBox(amount);
         for(int i = 0; i < (amount > item.getType().getMaxStackSize() ? amount : 1); i++) {
             if(Arrays.asList(player.getInventory().getStorageContents()).contains(null)) {
                 player.getInventory().addItem(item);
@@ -86,39 +119,5 @@ public class GiveBoxCommand implements IPluginCommand {
 
             Utils.dropItem(player, item);
         }
-    }
-
-    @Override
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        if(Math.max(args.length-1, 0) == 2) {
-            List<String> playerNames = new ArrayList<>();
-            Bukkit.getOnlinePlayers().forEach(player -> playerNames.add(player.getName()));
-            return playerNames;
-        }
-
-        if(Math.max(args.length-1, 0) == 3)
-            return List.of("1", "2", "4", "8", "16", "32", "64");
-
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        return "give-box";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Выдаёт указанному игроку указанное количество ящиков с карточками";
-    }
-
-    @Override
-    public List<String> getRequiredPermissions() {
-        return List.of("primplugin.commands.cards.giveBox");
-    }
-
-    @Override
-    public String getUsage() {
-        return "{игрок} [количество]";
     }
 }
