@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import ru.primland.plugin.commands.PrivateMessage;
+import ru.primland.plugin.commands.private_messages.PrivateMessage;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

@@ -6,12 +6,12 @@
 # Настройки для отправителя
 sender:
   # Сообщение, которое будет присылаться отправителю (строка)
-  message: "&#f4d172 ✉ &rВы → &#f4d172{receiver} › &r{message}"
+  message: "&#f4d172 ✉ &rВы &#f4d172→ {receiver} &7› &r{message}"
 
 # Настройки для получателя
 receiver:
   # Сообщение, которое будет присылаться получателю (строка)
-  message: "&#f4d172 ✉ &#f4d172{sender} → &rВы › &r{message}"
+  message: "&#f4d172 ✉ &#f4d172{sender} → &rВы &7› &r{message}"
 
   # Звук, который будет проигрываться при получении (строка)
   # Если звук не нужен, то укажите null
@@ -28,8 +28,8 @@ receiver:
     # {time[<format>]} - дата и время получения сообщения (формат указывать вместо <format>)
     #                    [См. https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html]
     #                    [Пример] {time[dd.MM.yyyy HH:mm]}
-    format: "&7[{time[dd.MM.yyyy HH:mm]}] &#f4d172 ✉ &#f4d172{sender} → &rВы › &r{message}"
+    format: "&7[{time[dd.MM.yyyy HH:mm]}] &#f4d172 ✉ &#f4d172{sender} → &rВы &7› &r{message}"
 
 # Ошибки при выполнении команды
 errors:
-  specifyMessage: "&cПожалуйста, укажите сообщение, которое Вы хотите отправить"
+  noOneToSend: "&cВам ещё никто не писал приватные сообщения! :("

@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.PrivateMessage;
+import ru.primland.plugin.commands.private_messages.PrivateMessage;
 import ru.primland.plugin.commands.whitelist.WhitelistCommand;
 import ru.primland.plugin.database.data.Message;
 import ru.primland.plugin.database.data.PrimPlayer;

@@ -1,4 +1,4 @@
-package ru.primland.plugin.commands;
+package ru.primland.plugin.commands.private_messages;
 
 import io.github.stngularity.epsilon.engine.placeholders.IPlaceholder;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
@@ -15,6 +15,7 @@ import ru.primland.plugin.commands.manager.CommandInfo;
 import ru.primland.plugin.commands.manager.argument.type.PlayerArgument;
 import ru.primland.plugin.commands.manager.argument.type.TextArgument;
 import ru.primland.plugin.database.data.PrimPlayer;
+import ru.primland.plugin.database.data.subdata.ChatOptions;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.ArrayList;
@@ -61,29 +62,37 @@ public class PrivateMessage extends Command {
      * @return Сообщение для отправителя команды
      */
     public @Nullable String execute(@NotNull CommandContext ctx) {
+        send(ctx, Objects.requireNonNull(ctx.get("receiver")), Objects.requireNonNull(ctx.get("message")));
+        return null;
+    }
+
+    /**
+     * Отправить указанному игроку приватное сообщение
+     *
+     * @param ctx     Контекст команды
+     * @param player  Объект игрока PrimLand
+     * @param message Приватное сообщение
+     */
+    public static void send(@NotNull CommandContext ctx, @NotNull PrimPlayer player, String message) {
         List<IPlaceholder> placeholders = new ArrayList<>();
         placeholders.add(new Placeholder("sender", ctx.sender.getName()));
-
-        // Получаем объект получателя (нам не нужно проверять всё это, т.к. это
-        // делается автоматически)
-        PrimPlayer player = Objects.requireNonNull(ctx.get("receiver"));
-        placeholders.add(new Placeholder("player", player));
-        placeholders.add(new Placeholder("receiver", player));
+        placeholders.add(new Placeholder("player", player.getName()));
+        placeholders.add(new Placeholder("receiver", player.getName()));
+        placeholders.add(new Placeholder("message", message));
 
         Player receiver = Bukkit.getPlayer(player.getName());
 
-        // Получаем сообщение и добавляем его как заполнитель
-        String message = Objects.requireNonNull(ctx.get("message"));
-        placeholders.add(new Placeholder("message", message));
+        ChatOptions options = player.getChat();
+        options.setLastReceived(ctx.sender.getName());
+        player.updateChatOptions(options);
 
         ctx.send(config.getString("sender.message"), placeholders);
         if(receiver != null) {
             receiver.sendMessage(Utils.parse(config.getString("receiver.message"), placeholders));
             Utils.playSound(receiver, player.getChat().getSound(), SoundCategory.PLAYERS);
-            return null;
+            return;
         }
 
         player.sendMessage(ctx.sender.getName(), message);
-        return null;
     }
 }
