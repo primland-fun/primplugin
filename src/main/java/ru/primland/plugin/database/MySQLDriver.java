@@ -13,6 +13,7 @@ import ru.primland.plugin.database.data.gifts.GiftContent;
 import ru.primland.plugin.database.data.gifts.GiftType;
 import ru.primland.plugin.database.data.gifts.GlobalGift;
 import ru.primland.plugin.database.data.subdata.*;
+import ru.primland.plugin.modules.manager.ModuleManager;
 import ru.primland.plugin.utils.Utils;
 
 import java.sql.*;
@@ -44,6 +45,11 @@ public class MySQLDriver {
             error.printStackTrace();
         } finally {
             working = true;
+            ModuleManager.cache.forEach((name, module) -> {
+                if(module.getInfo().databaseRequired())
+                    ModuleManager.enable(name);
+            });
+            
             setupTables();
         }
     }
@@ -52,6 +58,11 @@ public class MySQLDriver {
      * Обработка потери соединения с базой данных
      */
     public void handleConnectionDeath() {
+        ModuleManager.cache.forEach((name, module) -> {
+            if(module.getInfo().databaseRequired())
+                ModuleManager.disable(name);
+        });
+
         PrimPlugin.send("&eПлагин отключился от базы данных, пытаюсь переподключиться...");
         disconnect();
         PrimPlugin.instance.connectToDatabase();

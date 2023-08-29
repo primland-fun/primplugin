@@ -83,7 +83,7 @@ public class ModuleManager {
      */
     public static void disable(String name) {
         CachedModule module = cache.get(name);
-        if(module == null)
+        if(module == null || !module.getModule().enabled)
             return;
 
         module.getModule().unload(PrimPlugin.instance);
@@ -100,7 +100,10 @@ public class ModuleManager {
      */
     public static void enable(String name) {
         CachedModule module = cache.get(name);
-        if(module == null)
+        if(module == null || module.getModule().enabled)
+            return;
+
+        if(module.getConfig() != null && !module.getConfig().getBoolean("enabled", false))
             return;
 
         module.getModule().load(PrimPlugin.instance);
