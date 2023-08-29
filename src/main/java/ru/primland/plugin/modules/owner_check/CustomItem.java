@@ -15,10 +15,37 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.modules.manager.Module;
+import ru.primland.plugin.modules.manager.ModuleInfo;
+import ru.primland.plugin.modules.manager.ModuleManager;
 import ru.primland.plugin.utils.Utils;
 
-public class CustomItem implements IPluginModule, Listener {
-    private boolean enabled;
+@ModuleInfo(name="custom-items", config="owner_check", description="Защита от подбора кастомных вещей чужаками")
+public class CustomItem extends Module implements Listener {
+    private static Config config;
+    /**
+     * Загрузить (включить) модуль
+     *
+     * @param plugin Экземпляр плагина
+     */
+    @Override
+    public void load(@NotNull PrimPlugin plugin) {
+        config = getConfig();
+        if(config == null)
+            ModuleManager.disable("custom-items");
+
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    }
+
+    /**
+     * Отгрузить (выключить) модуль
+     *
+     * @param plugin Экземпляр плагина
+     */
+    @Override
+    public void unload(PrimPlugin plugin) {
+        EntityPickupItemEvent.getHandlerList().unregister(this);
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void onPickup(@NotNull EntityPickupItemEvent event) {
@@ -33,8 +60,7 @@ public class CustomItem implements IPluginModule, Listener {
         if(owner.equals(entity.getName()))
             return;
 
-        Config config = PrimPlugin.getInstance().getManager().getModuleConfig(getName());
-        if(entity.hasPermission("primplugin.pickupCustomWeapons")) {
+        if(entity.hasPermission("primplugin.pickup_custom_items")) {
             Player player = Bukkit.getPlayer(owner);
             if(player == null) return;
 
@@ -49,71 +75,5 @@ public class CustomItem implements IPluginModule, Listener {
                 Utils.parse(config.getString("error"), new Placeholder("owner", owner))));
 
         event.setCancelled(true);
-    }
-
-    /**
-     * Получает и возвращает название данного модуля
-     * @return Название модуля
-     */
-    @Override
-    public String getName() {
-        return "custom-weapons";
-    }
-
-    /**
-     * Получает и возвращает название конфигурации данного модуля
-     *
-     * @return Название модуля
-     */
-    @Override
-    public String getConfigName() {
-        return "owner_check.yml";
-    }
-
-    /**
-     * Получает и возвращает описание этого модуля
-     * @return Описание модуля
-     */
-    @Override
-    public String getDescription() {
-        return "Защита от подбора кастомных вещей не их владельцами";
-    }
-
-    /**
-     * Включает данный модуль
-     * @param plugin Объект PrimPlugin
-     */
-    @Override
-    public void enable(@NotNull PrimPlugin plugin) {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        enabled = true;
-    }
-
-    /**
-     * Выключает этот модуль
-     * @param plugin Объект PrimPlugin
-     */
-    @Override
-    public void disable(PrimPlugin plugin) {
-        EntityPickupItemEvent.getHandlerList().unregister(this);
-        enabled = false;
-    }
-
-    /**
-     * Включён ли модуль
-     * @return Ответ на данный выше вопрос
-     */
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * Немного информации о модуле плагина и его состоянии
-     * @return Информация о модуле
-     */
-    @Override
-    public String information() {
-        return null;
     }
 }

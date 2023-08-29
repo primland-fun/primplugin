@@ -11,7 +11,7 @@ permissions:
     default: op
     children:
       primplugin.commands.*: true
-      primplugin.pickupCustomWeapons: true
+      primplugin.pickup_custom_items: true
 
   primplugin.commands.*:
     description: "Доступ ко всем командам PrimPlugin (НЕ ДАВАЙТЕ ЭТО ОБЫЧНЫМ ИГРОКАМ)"
@@ -69,5 +69,5 @@ permissions:
   primplugin.commands.whitelist.list:
     description: "Доступ к команде /plwl list (Посмотреть список людей в белом списке)"
 
-  primplugin.pickupCustomWeapons:
-    description: "Возможность поднимать кастомные оружия"
+  primplugin.pickup_custom_items:
+    description: "Возможность поднимать кастомные вещи"
