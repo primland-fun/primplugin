@@ -51,7 +51,7 @@ jobs:
 
       - name: Получаем версию
         run: |
-          python3 -c "print('VERSION=v'+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0]" >> $GITHUB_ENV
+          python3 -c "print('VERSION=v'+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0])" >> $GITHUB_ENV
 
       - name: Скачиваем артефакт
         uses: actions/download-artifact@v3
