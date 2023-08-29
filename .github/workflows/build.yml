@@ -34,8 +34,8 @@ jobs:
       - name: Загружаем в артефакт
         uses: actions/upload-artifact@v3
         with:
-          path: "${{ github.workspace }}/**/PrimPlugin-${{ env.VERSION }}-remapped.jar"
-          name: "primplugin-v${{ env.VERSION }}.jar"
+          path: "${{ github.workspace }}/target/*.jar"
+          name: "primplugin-v${{ env.VERSION }}"
           if-no-files-found: error
 
   upload:
@@ -63,4 +63,4 @@ jobs:
           tag_name: "${{ env.VERSION }}"
           name: "PrimPlugin ${{ env.VERSION }}"
           files: |
-            **/primplugin-*.jar
+            **/*.jar
