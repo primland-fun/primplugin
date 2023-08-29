@@ -14,10 +14,13 @@ import ru.primland.plugin.modules.manager.ModuleManager;
 import ru.primland.plugin.modules.recipes.GlowEnchantment;
 import ru.primland.plugin.utils.Utils;
 
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PrimPlugin extends JavaPlugin {
+    public static final ZoneOffset msk = ZoneOffset.ofHours(3);
+
     public static PrimPlugin instance;
     public static Config config;
     public static Config i18n;

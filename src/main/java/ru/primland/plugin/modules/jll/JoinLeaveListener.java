@@ -73,7 +73,7 @@ public class JoinLeaveListener implements Listener {
         Utils.playSound(player, primPlayer.getChat().getSound(), SoundCategory.PLAYERS);
         messages.forEach(message -> player.sendMessage(
                 Utils.parse(PrivateMessage.config.getString("receiver.missedMessages.format"),
-                new TimePlaceholder(message.getTime()),
+                new TimePlaceholder(Utils.normalize(message.getTime())),
                 new Placeholder("sender", message.getSender()),
                 new Placeholder("receiver", player.getName()),
                 new Placeholder("message", message.getContent()))

@@ -150,6 +150,16 @@ public class Utils {
                 .dropItemNaturally(player.getLocation(), item));
     }
 
+    /**
+     * Нормализовать указанное время (перевести в МСК)
+     *
+     * @param time Время в UTC, которое надо перевести в МСК
+     * @return {@link LocalDateTime}
+     */
+    public static LocalDateTime normalize(@NotNull LocalDateTime time) {
+        return time.atOffset(PrimPlugin.msk).toLocalDateTime();
+    }
+
     @Contract("_ -> new")
     public static @NotNull LocalDateTime convertTimestampToTime(long timestamp) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), TimeZone.getDefault().toZoneId());

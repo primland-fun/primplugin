@@ -88,7 +88,7 @@ public class HeadDrop extends Module implements Listener {
      */
     public static @NotNull ItemStack getPlayerHead(@NotNull Player player, int chance) {
         List<IPlaceholder> placeholders = new ArrayList<>();
-        placeholders.add(new TimePlaceholder(LocalDateTime.now()));
+        placeholders.add(new TimePlaceholder(Utils.normalize(LocalDateTime.now())));
         placeholders.add(new Placeholder("player", player.getName()));
         placeholders.add(new Placeholder("chance", chance));
 
