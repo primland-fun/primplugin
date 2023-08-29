@@ -22,18 +22,19 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: maven
 
       - name: Компилируем в JAR
-        run: mvn clean package
+        run: mvn package
 
       - name: Получаем версию
         run: |
           python3 -c "print('VERSION='+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0])" >> $GITHUB_ENV
 
-      - name: Загружаем в артифакт
+      - name: Загружаем в артефакт
         uses: actions/upload-artifact@v3
         with:
-          path: "${{ github.workspace }}/target/PrimPlugin-${{ env.VERSION }}-remapped.jar"
+          path: "${{ github.workspace }}/**/PrimPlugin-${{ env.VERSION }}-remapped.jar"
           name: "primplugin-v${{ env.VERSION }}.jar"
           if-no-files-found: error
 
@@ -52,7 +53,7 @@ jobs:
         run: |
           python3 -c "print('VERSION=v'+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0]" >> $GITHUB_ENV
 
-      - name: Скачиваем артифакт
+      - name: Скачиваем артефакт
         uses: actions/download-artifact@v3
 
       - name: Публикуем на GitHub
