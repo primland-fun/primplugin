@@ -1,6 +1,5 @@
 package ru.primland.plugin.commands.whitelist;
 
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.Config;
@@ -56,18 +55,18 @@ public class WhitelistCommand extends Command {
     /**
      * Содержит ли белый список указанного игрока
      *
-     * @param player Объект игрока
+     * @param player Ник игрока
      * @return true, если содержит, иначе false
      */
-    public static boolean whitelistContains(@NotNull Player player) {
-        return config.getStringList("whitelist").contains(player.getName());
+    public static boolean whitelistContains(@NotNull String player) {
+        return config.getStringList("whitelist").contains(player);
     }
 
     /**
      * Получить причину для кика игрока, которого нет в белом списке
      * @return Причина
      */
-    public String getReason() {
+    public static @NotNull String getReason() {
         return Utils.parse(String.join("\n", config.getStringList("messages.kick")));
     }
 }
