@@ -33,7 +33,7 @@ jobs:
       - name: Загружаем в артифакт
         uses: actions/upload-artifact@v3
         with:
-          path: "target/PrimPlugin-${{ env.VERSION }}-remapped.jar"
+          path: "${{ github.workspace }}/target/PrimPlugin-${{ env.VERSION }}-remapped.jar"
           name: "primplugin-v${{ env.VERSION }}.jar"
           if-no-files-found: error
 
