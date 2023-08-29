@@ -8,6 +8,7 @@ import ru.primland.plugin.PrimPlugin;
 import ru.primland.plugin.commands.manager.Command;
 import ru.primland.plugin.commands.manager.CommandContext;
 import ru.primland.plugin.commands.manager.CommandInfo;
+import ru.primland.plugin.modules.manager.ModuleManager;
 import ru.primland.plugin.utils.Utils;
 
 import java.time.LocalDateTime;
@@ -52,7 +53,8 @@ public class StatusCommand extends Command {
                 PrimPlugin.i18n.getStringList("status.header"))));
 
         output.append(processItem("Драйвер базы данных", PrimPlugin.driver.isWorking(), placeholders));
-        // TODO: Состояние модулей из менеджера модулей
+        ModuleManager.cache.forEach((name, module) -> output.append(processItem(
+                name, module.getModule().enabled, placeholders)));
 
         output.append(Utils.parse(String.join("\n", PrimPlugin.i18n.getStringList("status.footer"))));
         return Utils.parse(output.toString(), placeholders);

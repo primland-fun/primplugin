@@ -49,7 +49,7 @@ public class MySQLDriver {
                 if(module.getInfo().databaseRequired())
                     ModuleManager.enable(name);
             });
-            
+
             setupTables();
         }
     }
