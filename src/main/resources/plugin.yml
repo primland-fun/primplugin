@@ -22,7 +22,7 @@ permissions:
       primplugin.commands.rep.set: true
       primplugin.commands.cards.give_box: true
       primplugin.commands.cards.give_card: true
-      primplugin.commands.headDrop.getHead: true
+      primplugin.commands.heads.give: true
       primplugin.commands.whitelist.add: true
       primplugin.commands.whitelist.remove: true
       primplugin.commands.whitelist.list: true
@@ -52,8 +52,13 @@ permissions:
     children:
       primplugin.commands.cards.primary: true
 
-  primplugin.commands.headDrop.getHead:
-    description: "Доступ к команде /prim heads get {игрок} (Получить голову указанного игрока)"
+  primplugin.commands.heads.primary:
+    description: "Доступ к команде /heads"
+
+  primplugin.commands.heads.give:
+    description: "Доступ к команде /heads give {игрок} [получатель]"
+    children:
+      primplugin.commands.heads.primary: true
 
   primplugin.commands.whitelist.add:
     description: "Доступ к команде /plwl add {игрок} (Добавить игрока в белый список)"

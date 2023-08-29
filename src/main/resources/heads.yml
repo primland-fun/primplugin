@@ -27,11 +27,6 @@ chances:
 #                    [См. https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html]
 #                    [Пример] {time[dd.MM.yyyy HH:mm]}
 drop:
-  # Звук, проигрываемый при выпадении головы (строка)
-  # Укажите null, чтобы убрать звук
-  # По умолчанию: null
-  sound: "UI_TOAST_CHALLENGE_COMPLETE"
-
   # Отображаемое название головы (строка)
   displayName: ""
 
@@ -46,12 +41,6 @@ drop:
 # Настройки команды
 command:
   # Сообщение от успешной выдачи головы (строка)
-  # {player} - ник указанного игрока
-  doneMessage: "Голова игрока &#65caef{player} &rуспешно выдана Вам"
-
-  # Ошибки команды
-  errors:
-    specifyPlayer: "&cВы должны указать любого игрока!"
-
-    # {player} - указанный игрок
-    playerNotFound: "&cИгрока &r{player} &cне найден!"
+  # {player}   - ник указанного игрока
+  # {receiver} - ник получателя
+  doneMessage: "Голова игрока &#65caef{player} &rуспешно выдана игроку &#65caef{receiver}"
