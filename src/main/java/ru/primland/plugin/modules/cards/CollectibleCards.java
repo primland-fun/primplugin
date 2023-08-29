@@ -260,15 +260,7 @@ public class CollectibleCards extends Module implements Listener {
             item.setAmount(item.getAmount()-1);
             players.remove(player.getName());
 
-            giveCards.forEach(card -> {
-                if(Arrays.asList(player.getInventory().getStorageContents()).contains(null)) {
-                    player.getInventory().addItem(card);
-                    return;
-                }
-
-                Utils.dropItem(player, card);
-            });
-
+            giveCards.forEach(card -> Utils.give(player, card));
             PrimPlugin.send(player, Utils.parse(config.getString("box.message"),
                     new Placeholder("cards", String.join(", ", giveCardNames))));
         });

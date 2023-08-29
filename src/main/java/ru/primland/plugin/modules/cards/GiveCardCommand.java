@@ -79,12 +79,10 @@ public class GiveCardCommand extends Command {
         });
 
         ItemStack item = CollectibleCards.getCard(rarity.get(), card.get());
-        if(item == null) return null;
+        if(item == null)
+            return null;
 
-        // TODO: Сделать функцию для выдачи предмета
-        if(Arrays.asList(ctx.sender.getInventory().getStorageContents()).contains(null)) {
-            ctx.sender.getInventory().addItem(item);
-        } else Utils.dropItem(ctx.sender, item);
+        Utils.give(ctx.sender, item);
 
         return Utils.parse(
                 config.getString("cards.commandDone"),

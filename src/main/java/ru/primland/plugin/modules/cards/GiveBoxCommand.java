@@ -20,7 +20,6 @@ import ru.primland.plugin.utils.NBTUtils;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @CommandInfo(
@@ -111,13 +110,7 @@ public class GiveBoxCommand extends Command {
      */
     public static void giveBox(Player player, int amount) {
         ItemStack item = getBox(amount);
-        for(int i = 0; i < (amount > item.getType().getMaxStackSize() ? amount : 1); i++) {
-            if(Arrays.asList(player.getInventory().getStorageContents()).contains(null)) {
-                player.getInventory().addItem(item);
-                continue;
-            }
-
-            Utils.dropItem(player, item);
-        }
+        for(int i = 0; i < (amount > item.getType().getMaxStackSize() ? amount : 1); i++)
+            Utils.give(player, item);
     }
 }

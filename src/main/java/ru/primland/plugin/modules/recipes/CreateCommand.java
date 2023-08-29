@@ -3,7 +3,6 @@ package ru.primland.plugin.modules.recipes;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
@@ -14,7 +13,6 @@ import ru.primland.plugin.commands.manager.argument.type.StringArgument;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -63,13 +61,7 @@ public class CreateCommand extends Command {
         if(key == null)
             return PrimPlugin.i18n.getString("internalError");
 
-        ItemStack result = Objects.requireNonNull(Bukkit.getServer().getRecipe(key)).getResult();
-
-        // TODO: заменить на Utils#give
-        if(Arrays.asList(ctx.sender.getInventory().getStorageContents()).contains(null)) {
-            ctx.sender.getInventory().addItem(result);
-        } else Utils.dropItem(ctx.sender, result);
-
+        Utils.give(ctx.sender, Objects.requireNonNull(Bukkit.getServer().getRecipe(key)).getResult());
         return Utils.parse(CustomRecipes.config.getString("commandDone"), new Placeholder("recipe", recipe));
     }
 

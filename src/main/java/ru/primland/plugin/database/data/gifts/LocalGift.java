@@ -5,7 +5,6 @@ import lombok.Setter;
 import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.primland.plugin.PrimPlugin;
@@ -13,8 +12,6 @@ import ru.primland.plugin.database.MySQLDriver;
 import ru.primland.plugin.database.data.PrimPlayer;
 import ru.primland.plugin.database.data.subdata.Balance;
 import ru.primland.plugin.utils.Utils;
-
-import java.util.Arrays;
 
 @Getter @Setter
 public class LocalGift extends GlobalGift {
@@ -49,14 +46,7 @@ public class LocalGift extends GlobalGift {
         if(player == null)
             return "playerOffline";
 
-        Inventory inventory = player.getInventory();
-        getContent().getItemContent().forEach(item -> {
-            if(Arrays.asList(player.getInventory().getStorageContents()).contains(null))
-                inventory.addItem(item);
-
-            Utils.dropItem(player, item);
-        });
-
+        getContent().getItemContent().forEach(item -> Utils.give(player, item));
         Balance balance = getContent().getBalanceContent();
         if(balance.getReputation() != 0 || balance.getDonate() != 0) {
             PrimPlayer primPlayer = getDriver().getPlayer(receiver);

@@ -125,9 +125,29 @@ public class Utils {
         player.playSound(player, sound, category, volume, 1f);
     }
 
-    public static void dropItem(Player player, ItemStack item) {
-        Bukkit.getScheduler().runTask(PrimPlugin.instance, () ->
-                player.getWorld().dropItemNaturally(player.getLocation(), item));
+    /**
+     * Дать игроку указанный предмет<br>
+     * 1. Если у игрока есть свободное место в инвентаре, то дать ему предмет<br>
+     * 2. Если нет свободного места, но есть предмет того же типа, то увеличить
+     *    количество предмета на 1<br>
+     * 3. Иначе выкинуть предмет рядом с ним<br>
+     *
+     * @param player Объект игрока, которому надо выдать предмет
+     * @param item   Объект предмета, который надо выдать
+     */
+    public static void give(@NotNull Player player, @NotNull ItemStack item) {
+        if(Arrays.asList(player.getInventory().getStorageContents()).contains(null)) {
+            player.getInventory().addItem(item);
+            return;
+        }
+
+        if(player.getInventory().contains(item)) {
+            player.getInventory().addItem(item);
+            return;
+        }
+
+        Bukkit.getScheduler().runTask(PrimPlugin.instance, () -> player.getWorld()
+                .dropItemNaturally(player.getLocation(), item));
     }
 
     @Contract("_ -> new")
