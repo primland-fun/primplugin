@@ -3,14 +3,14 @@ package ru.primland.plugin.modules.recipes;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
-import ru.primland.plugin.commands.plugin.IPluginCommand;
+import ru.primland.plugin.commands.manager.Command;
+import ru.primland.plugin.commands.manager.CommandContext;
+import ru.primland.plugin.commands.manager.CommandInfo;
+import ru.primland.plugin.commands.manager.argument.type.StringArgument;
 import ru.primland.plugin.utils.Utils;
 
 import java.util.ArrayList;
@@ -20,89 +20,80 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CreateCommand implements IPluginCommand {
+@CommandInfo(
+        name="create",
+        description="Воссоздать результат указанного рецепта",
+        permission="primplugin.commands.recipes.create",
+        parent="recipes"
+)
+public class CreateCommand extends Command {
     private static final Pattern namespacePattern = Pattern.compile("(?:[^:]+:)?(.+)");
-    private final Config config;
 
-    public CreateCommand(Config cardsConfig) {
-        this.config = cardsConfig;
+    /**
+     * Загрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
+    @Override
+    public void load(PrimPlugin plugin) {
+        addArgument(new StringArgument("recipe", "ID рецепта", true, (ctx) -> getRecipes(true)));
     }
 
+    /**
+     * Отгрузить данные команды
+     *
+     * @param plugin Экземпляр плагина
+     */
     @Override
-    public void execute(@NotNull CommandSender sender, @NotNull List<String> args) {
-        if(args.size() == 0) {
-            PrimPlugin.send(sender, Utils.parse(config.getString("errors.specifyRecipe")));
-            return;
-        }
+    public void unload(PrimPlugin plugin) {}
 
-        String recipe = args.get(0);
-        if(!getRecipes().contains(recipe) && !getRecipes(true).contains(recipe)) {
-            PrimPlugin.send(sender, Utils.parse(config.getString("errors.invalidRecipe"),
-                    new Placeholder("recipe", recipe)));
-
-            return;
-        }
+    /**
+     * Выполнить команду с указанными данными
+     *
+     * @param ctx Контекст команды
+     * @return Сообщение для отправителя команды
+     */
+    @Override
+    public @Nullable String execute(@NotNull CommandContext ctx) {
+        String recipe = Objects.requireNonNull(ctx.get("recipe"));
+        if(!getRecipes(true).contains(recipe) && !getRecipes(false).contains(recipe))
+            return Utils.parse(CustomRecipes.config.getString("invalidRecipe"), new Placeholder("recipe", recipe));
 
         NamespacedKey key = getKeyByStringKey(recipe);
-        if(key == null) {
-            PrimPlugin.send(sender, Utils.parse(config.getString("errors.pluginSideError")));
-            return;
-        }
+        if(key == null)
+            return PrimPlugin.i18n.getString("internalError");
 
         ItemStack result = Objects.requireNonNull(Bukkit.getServer().getRecipe(key)).getResult();
 
-        Player player = (Player) sender;
-        if(Arrays.asList(player.getInventory().getStorageContents()).contains(null)) {
-            player.getInventory().addItem(result);
-        } else Utils.dropItem(player, result);
+        // TODO: заменить на Utils#give
+        if(Arrays.asList(ctx.sender.getInventory().getStorageContents()).contains(null)) {
+            ctx.sender.getInventory().addItem(result);
+        } else Utils.dropItem(ctx.sender, result);
 
-        PrimPlugin.send(sender, Utils.parse(config.getString("commandDone"),
-                new Placeholder("recipe", recipe)));
+        return Utils.parse(CustomRecipes.config.getString("commandDone"), new Placeholder("recipe", recipe));
     }
 
-    @Override
-    public List<String> tabComplete(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        if(Math.max(args.length-1, 0) == 2)
-            return getRecipes();
-
-        return null;
-    }
-
-    private @NotNull List<String> getRecipes() {
-        return getRecipes(false);
-    }
-
-    private @NotNull List<String> getRecipes(boolean withoutNamespace) {
+    /**
+     * Получить список с рецептами плагина
+     *
+     * @param namespace Должно ли пространство имён содержаться в ID рецептов
+     * @return Список строк
+     */
+    private @NotNull List<String> getRecipes(boolean namespace) {
         List<String> keys = new ArrayList<>();
-        CustomRecipes.getRegisteredRecipes().forEach(recipe -> keys.add(withoutNamespace ? recipe.getKey()
-                : recipe.toString()));
-
+        CustomRecipes.registeredRecipes.forEach(recipe -> keys.add(namespace ? recipe.toString() : recipe.getKey()));
         return keys;
     }
 
+    /**
+     * Получить ключ пространства имён используя его копию в виде строки
+     *
+     * @param key Ключ-строк
+     * @return {@link NamespacedKey}
+     */
     private @Nullable NamespacedKey getKeyByStringKey(String key) {
         Matcher matcher = namespacePattern.matcher(key);
         if(!matcher.matches()) return null;
-        return new NamespacedKey(PrimPlugin.getInstance(), matcher.group(1));
-    }
-
-    @Override
-    public String getName() {
-        return "create";
-    }
-
-    @Override
-    public String getDescription() {
-        return "Создаёт и выдаёт Вам результат указанного рецепта";
-    }
-
-    @Override
-    public List<String> getRequiredPermissions() {
-        return List.of("primplugin.commands.recipes.create");
-    }
-
-    @Override
-    public String getUsage() {
-        return "{id рецепта}";
+        return new NamespacedKey(PrimPlugin.instance, matcher.group(1));
     }
 }

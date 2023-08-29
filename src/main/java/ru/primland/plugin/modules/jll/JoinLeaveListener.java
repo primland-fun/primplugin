@@ -35,7 +35,7 @@ public class JoinLeaveListener implements Listener {
     public void onPreLogin(@NotNull AsyncPlayerPreLoginEvent event) {
         if(!WhitelistCommand.config.getBoolean("enabled", true))
             return;
-        
+
         if(WhitelistCommand.whitelistContains(event.getName()))
             return;
 
@@ -82,7 +82,7 @@ public class JoinLeaveListener implements Listener {
     }
 
     private void recipes(@NotNull Player player) {
-        CustomRecipes.getRegisteredRecipes().forEach(recipe -> {
+        CustomRecipes.registeredRecipes.forEach(recipe -> {
             if(player.hasDiscoveredRecipe(recipe)) return;
             player.discoverRecipe(recipe);
         });

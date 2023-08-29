@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 
 public class GlowEnchantment extends Enchantment {
     public GlowEnchantment() {
-        super(new NamespacedKey(PrimPlugin.getInstance(), "glow"));
+        super(new NamespacedKey(PrimPlugin.instance, "glow"));
     }
 
     @NotNull

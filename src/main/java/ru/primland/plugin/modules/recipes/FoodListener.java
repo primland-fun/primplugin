@@ -2,7 +2,6 @@ package ru.primland.plugin.modules.recipes;
 
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.GameMode;
-import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
@@ -24,6 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FoodListener implements Listener {
+    // TODO: Полностью переписать
+
     private final Config config;
     private final List<Map<?, ?>> recipes;
     

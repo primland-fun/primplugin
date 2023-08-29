@@ -3,125 +3,73 @@ package ru.primland.plugin.modules.recipes;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.Recipe;
-import org.jetbrains.annotations.NotNull;
 import ru.primland.plugin.Config;
 import ru.primland.plugin.PrimPlugin;
+import ru.primland.plugin.modules.manager.Module;
+import ru.primland.plugin.modules.manager.ModuleInfo;
+import ru.primland.plugin.modules.manager.ModuleManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CustomRecipes implements IPluginModule {
-    private static final List<NamespacedKey> registeredRecipes = new ArrayList<>();
+@ModuleInfo(name="recipes", config="recipes", description="Кастомные рецепты для нашего сервера")
+public class CustomRecipes extends Module {
+    // TODO: Полностью переписать
+    public static final List<NamespacedKey> registeredRecipes = new ArrayList<>();
+    public static Config config;
 
-    private boolean enabled;
     private List<Map<?, ?>> recipes;
     private FoodListener listener;
-    private ItemFramesFix fix;
-
-    public static List<NamespacedKey> getRegisteredRecipes() {
-        return registeredRecipes;
-    }
-
-    public static void registerRecipeLocally(NamespacedKey key) {
-        registeredRecipes.add(key);
-    }
 
     /**
-     * Получает и возвращает название данного модуля
-     * @return Название модуля
+     * Загрузить (включить) модуль
+     *
+     * @param plugin Экземпляр плагина
      */
     @Override
-    public String getName() {
-        return "recipes";
-    }
-
-    /**
-     * Получает и возвращает название конфигурации данного модуля
-     * @return Название модуля
-     */
-    @Override
-    public String getConfigName() {
-        return "recipes.yml";
-    }
-
-    /**
-     * Получает и возвращает описание этого модуля
-     * @return Описание модуля
-     */
-    @Override
-    public String getDescription() {
-        return "Кастомные рецепты для нашего сервера";
-    }
-
-    /**
-     * Включает данный модуль
-     * @param plugin Объект PrimPlugin
-     */
-    @Override
-    public void enable(@NotNull PrimPlugin plugin) {
-        Config config = plugin.getManager().getModuleConfig(getName());
+    public void load(PrimPlugin plugin) {
+        config = getConfig();
+        if(config == null)
+            ModuleManager.disable("recipes");
 
         // Добавляем рецепты
-        recipes = plugin.getManager().getModuleConfig(getName()).getMapList("recipes");
+        recipes = config.getMapList("recipes");
 
         String foodSignature = config.getString("foodSignature", "prp_type=food:{id}");
         recipes.forEach(rawRecipe -> {
             Recipe recipe = RecipeUtils.toRecipe(rawRecipe, foodSignature);
-            if(recipe == null) return;
+            if(recipe == null)
+                return;
+
             Bukkit.addRecipe(recipe);
         });
 
         // Регистрируем слушатели
         listener = new FoodListener(config, recipes);
         listener.register(plugin);
-
-        // TODO: fix = new ItemFramesFix();
-        // fix.register(plugin);
-
-        // Регистрируем команды
-        plugin.getManager().registerCommandFor(getName(), new CreateCommand(
-                PrimPlugin.getInstance().getManager().getModuleConfig(getName())));
-
-        // Маркируем модуль как включённый
-        enabled = true;
     }
 
     /**
-     * Выключает этот модуль
-     * @param plugin Объект PrimPlugin
+     * Отгрузить (выключить) модуль
+     *
+     * @param plugin Экземпляр плагина
      */
     @Override
-    public void disable(@NotNull PrimPlugin plugin) {
+    public void unload(PrimPlugin plugin) {
         recipes.forEach(recipe -> Bukkit.getServer().removeRecipe(new NamespacedKey(plugin,
                 "recipe." + recipe.get("id").toString())));
 
         // Отменяем регистрацию слушателей
         listener.unregister();
-        //fix.unregister();
-
-        // Удаляем из главной команды плагина команду recipes
-        plugin.getManager().unregisterCommandsFor(getName());
-
-        // Маркируем модуль как выключенный
-        enabled = false;
     }
 
     /**
-     * Включён ли модуль
-     * @return Ответ на данный выше вопрос
+     * Зарегистрировать рецепт локально
+     *
+     * @param key Ключ рецепта
      */
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * Немного информации о модуле плагина и его состоянии
-     * @return Информация о модуле
-     */
-    @Override
-    public String information() {
-        return null;
+    public static void registerRecipeLocally(NamespacedKey key) {
+        registeredRecipes.add(key);
     }
 }

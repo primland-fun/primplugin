@@ -19,7 +19,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Утилиты для работы с рецептами
+ */
 public class RecipeUtils {
+    // TODO: Полностью переписать
+
+    /**
+     * Преобразовать указанные данные в рецепт
+     *
+     * @param instruction   Инструкция по созданию экземпляра рецепта
+     * @param foodSignature Сигнатура еды
+     * @return {@link Recipe}, если можно создать, иначе null
+     */
     public static @Nullable Recipe toRecipe(@NotNull Map<?, ?> instruction, String foodSignature) {
         if(notContainsKeys(instruction, "type", "id", "recipe", "result")) {
             PrimPlugin.send("&cНе указан обязательный ключ (recipes.yml)");
@@ -32,9 +44,8 @@ public class RecipeUtils {
             return null;
         }
 
-        PrimPlugin plugin = PrimPlugin.getInstance();
         String id = instruction.get("id").toString();
-        NamespacedKey key = new NamespacedKey(plugin, "recipe." + id);
+        NamespacedKey key = new NamespacedKey(PrimPlugin.instance, "recipe." + id);
 
         Map<?, ?> result = Utils.convertObjectToMap(instruction.get("result"));
         if(notContainsKeys(result, "material")) {

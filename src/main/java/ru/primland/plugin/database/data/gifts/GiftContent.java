@@ -89,39 +89,36 @@ public class GiftContent {
 
         List<?> parsed = (new Gson()).fromJson(json, List.class);
         parsed.forEach(raw -> {
-            Map<String, Object> object = Utils.convertObjectToMap(raw, Object.class);
+            Map<String, Object> object = Utils.convertObjectToMap(raw);
             String type = String.valueOf(object.get("type"));
 
             // Если тип объекта - это item, то просто вызываем ItemStack.deserialize
             // с данными ($.data) в качестве аргумента
             if(type.equals("item"))
-                output.addItem(ItemStack.deserialize(Utils.convertObjectToMap(object.get("data"), Object.class)));
+                output.addItem(ItemStack.deserialize(Utils.convertObjectToMap(object.get("data"))));
 
             // Если тип объекта - это group, то преобразовываем его в право с помощью
             // функции getPermission
             if(type.equals("group")) {
-                output.addPermission(getPermission("group.", Utils.convertObjectToMap(object.get("data"),
-                        Object.class)));
+                output.addPermission(getPermission("group.", Utils.convertObjectToMap(object.get("data"))));
             }
 
             // Если тип объекта - это pet, то преобразовываем его в право с помощью
             // функции getPermission
             if(type.equals("pet")) {
-                output.addPermission(getPermission("mcpets.", Utils.convertObjectToMap(object.get("data"),
-                        Object.class)));
+                output.addPermission(getPermission("mcpets.", Utils.convertObjectToMap(object.get("data"))));
             }
 
             // Если тип объекта - это permission, то преобразовываем его в право с
             // помощью функции getPermission
             if(type.equals("permission")) {
-                output.addPermission(getPermission("", Utils.convertObjectToMap(object.get("data"),
-                        Object.class)));
+                output.addPermission(getPermission("", Utils.convertObjectToMap(object.get("data"))));
             }
 
             // Если тип объекта - это balance, то создаём новый объект Balance и
             // указываем в качестве аргументов одноимённые данные
             if(type.equals("balance")) {
-                Map<String, Integer> data = Utils.convertObjectToMap(object.get("data"), Integer.class);
+                Map<String, Integer> data = Utils.convertObjectToMap(object.get("data"));
                 output.setBalanceContent(new Balance(data.get("reputation"), data.get("donate")));
             }
         });
