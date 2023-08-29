@@ -37,27 +37,3 @@ jobs:
           path: "${{ github.workspace }}/target/*.jar"
           name: "primplugin-v${{ env.VERSION }}"
           if-no-files-found: error
-
-  upload:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Получаем исходники
-        uses: actions/checkout@v3
-
-      - name: Получаем версию
-        run: |
-          python3 -c "print('VERSION='+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0])" >> $GITHUB_ENV
-
-      - name: Скачиваем артефакт
-        uses: actions/download-artifact@v3
-
-      - name: Публикуем на GitHub
-        uses: softprops/action-gh-release@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body_path: CHANGELOG.md
-          tag_name: "v${{ env.VERSION }}"
-          name: "PrimPlugin v${{ env.VERSION }}"
-          files: |
-            **/*.jar
