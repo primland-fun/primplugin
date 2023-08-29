@@ -7,6 +7,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
@@ -90,7 +91,24 @@ public class Utils {
         return false;
     }
 
+    /**
+     * Проиграть игроку звук в "Общем" канале громкости
+     *
+     * @param player   Объект игрока
+     * @param original Строка, обозначающая звук
+     */
     public static void playSound(Player player, String original) {
+        playSound(player, original, SoundCategory.MASTER);
+    }
+
+    /**
+     * Проиграть игроку звук в указанном канале громкости
+     *
+     * @param player   Объект игрока
+     * @param original Строка, обозначающая звук
+     * @param category Канал громкости звука
+     */
+    public static void playSound(Player player, String original, SoundCategory category) {
         if(original == null || original.equals("null"))
             return;
 
@@ -104,7 +122,7 @@ public class Utils {
         if(data.length > 1) volume = Float.parseFloat(data[1]);
 
         Sound sound = Sound.valueOf(data[0]);
-        player.playSound(player, sound, volume, 1f);
+        player.playSound(player, sound, category, volume, 1f);
     }
 
     public static void dropItem(Player player, ItemStack item) {

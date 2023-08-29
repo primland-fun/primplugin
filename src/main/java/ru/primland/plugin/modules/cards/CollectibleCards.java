@@ -4,6 +4,7 @@ import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import net.minecraft.nbt.StringTag;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.SoundCategory;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -220,7 +221,7 @@ public class CollectibleCards extends Module implements Listener {
                 String actionData = matcher.group(2);
                 switch(actionType) {
                     case "SOUND" ->
-                            Utils.playSound(player, actionData);
+                            Utils.playSound(player, actionData, SoundCategory.MUSIC);
 
                     case "TITLE" -> {
                         boolean isSubtitle = actionData.startsWith(":subtitle:");

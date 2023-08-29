@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Bukkit;
+import org.bukkit.SoundCategory;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,7 +68,7 @@ public class CustomItem extends Module implements Listener {
             PrimPlugin.send(player, Utils.parse(config.getString("notification.message"),
                     new Placeholder("admin", entity.getName())));
 
-            Utils.playSound(player, config.getString("notification.sound", null));
+            Utils.playSound(player, config.getString("notification.sound", null), SoundCategory.PLAYERS);
             return;
         }
 

@@ -2,6 +2,7 @@ package ru.primland.plugin.modules.jll;
 
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import io.github.stngularity.epsilon.engine.placeholders.TimePlaceholder;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -69,7 +70,7 @@ public class JoinLeaveListener implements Listener {
         player.sendMessage(Utils.parse(PrivateMessage.config.getString("receiver.missedMessages.message"),
                 new Placeholder("count", messages.size())));
 
-        Utils.playSound(player, primPlayer.getChat().getSound());
+        Utils.playSound(player, primPlayer.getChat().getSound(), SoundCategory.PLAYERS);
         messages.forEach(message -> player.sendMessage(
                 Utils.parse(PrivateMessage.config.getString("receiver.missedMessages.format"),
                 new TimePlaceholder(message.getTime()),

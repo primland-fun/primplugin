@@ -2,6 +2,7 @@ package ru.primland.plugin.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -102,7 +103,7 @@ public class HelpCommand extends Command {
                     String actionData = matcher.group(2);
 
                     if(actionType.equals("SOUND"))
-                        Utils.playSound(player, actionData);
+                        Utils.playSound(player, actionData, SoundCategory.BLOCKS);
 
                     if(actionType.equals("MESSAGE") && actionData.isEmpty())
                         PrimPlugin.send("&cУкажите сообщение! (minecraft_help.yml)");

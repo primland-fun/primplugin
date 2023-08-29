@@ -3,6 +3,7 @@ package ru.primland.plugin.commands;
 import io.github.stngularity.epsilon.engine.placeholders.IPlaceholder;
 import io.github.stngularity.epsilon.engine.placeholders.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -78,7 +79,7 @@ public class PrivateMessage extends Command {
         ctx.send(config.getString("sender.message"), placeholders);
         if(receiver != null) {
             receiver.sendMessage(Utils.parse(config.getString("receiver.message"), placeholders));
-            Utils.playSound(receiver, player.getChat().getSound());
+            Utils.playSound(receiver, player.getChat().getSound(), SoundCategory.PLAYERS);
             return null;
         }
 
