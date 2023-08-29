@@ -28,7 +28,7 @@ jobs:
 
       - name: Получаем версию
         run: |
-          python3 -c "print('VERSION='+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0]" >> $GITHUB_ENV
+          python3 -c "print('VERSION='+__import__('re').findall(r'<version>([^<]+)</version>',open('pom.xml','r',encoding='utf8').read())[0])" >> $GITHUB_ENV
 
       - name: Загружаем в артифакт
         uses: actions/upload-artifact@v3
